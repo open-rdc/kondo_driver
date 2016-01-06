@@ -1,5 +1,5 @@
 /**
- * Kondo ICS motor driver
+ * Kondo ICS & B3M motor driver
  */
 #include <boost/shared_ptr.hpp>
 #include <math.h>
@@ -40,6 +40,7 @@ private:
     ros::ServiceServer power_service;
     int id;
     ICSData* ics;
+	B3MData* b3m;
     int stretch;
     int speed;
     int curr_limit; // current limit
@@ -54,17 +55,17 @@ public:
 	res.result = req.request;
 	return true;
     }
-    KondoMotor (ICSData* ics, std::string actuator_name, hardware_interface::JointStateInterface& state_interface, hardware_interface::PositionJointInterface& pos_interface, bool loopback=false) : cmd(0), pos(0), vel(0), eff(0) {
+    KondoMotor (B3MData* b3m, std::string actuator_name, hardware_interface::JointStateInterface& state_interface, hardware_interface::PositionJointInterface& pos_interface, bool loopback=false) : cmd(0), pos(0), vel(0), eff(0) {
 	motor_power = true;
 	this->loopback = loopback;
-	this->ics = ics;
+	this->b3m = b3m;
 	ros::NodeHandle nh(std::string("~")+actuator_name);
 	if (nh.getParam("id", id)) {
 	    ROS_INFO("id: %d", id);
 	}
 	if (!loopback) {
 	    // Check motor existence
-	    if (ics_pos(ics, id, 0) <= 0) {
+	    if (b3m_pos(b3m, id, 0) <= 0) {
 		ROS_WARN("Cannot connect to servo ID: %d", id);
 	    }
 	}
@@ -115,14 +116,14 @@ public:
 	    eff = 0;
 	}else{
 	    int pulse_ret = 0;
-	pulse_ret= ics_pos(ics, id, pulse_cmd);
+	pulse_ret= b3m_pos(b3m, id, pulse_cmd);
 	    if (pulse_ret > 0) {
 		pos = pulse_to_radian (pulse_ret);
 	    }
 	    /* how can I get speed ? */
 	    vel = 0;
 	    /* get servo current */
-	    int current = ics_get_current(ics, id);
+	    int current = b3m_get_current(b3m, id);
 	    if (current > 0) {
 		if (current < 64) {
 		    eff = current;
@@ -137,7 +138,7 @@ public:
 	if (loopback) {
 	    this->speed = speed;
 	}else {
-	    this->speed = ics_set_speed(ics, id, speed);
+	    this->speed = b3m_set_speed(b3m, id, speed);
 	    ROS_INFO("%s: %d", __func__, this->speed);
 	}
     }
@@ -146,7 +147,7 @@ public:
 	if (loopback) {
 	    this->stretch = stretch;
 	}else {
-	    this->stretch = ics_set_stretch(ics, id, stretch);
+	    this->stretch = b3m_set_stretch(b3m, id, stretch);
 	    ROS_INFO("%s: %d", __func__, this->stretch);
 	}
     }
@@ -155,7 +156,7 @@ public:
 	if (loopback) {
 	    curr_limit = curr;
 	}else {
-	    this->curr_limit = ics_set_stretch(ics, id, curr);
+	    this->curr_limit = b3m_set_stretch(b3m, id, curr);
 	    ROS_INFO("%s: %d", __func__, this->curr_limit);
 	}
     }
@@ -164,7 +165,7 @@ public:
 	if (loopback) {
 	    temp_limit = temp;
 	}else {
-	    this->temp_limit = ics_set_temperature_limit(ics, id, temp);
+	    this->temp_limit = b3m_set_temperature_limit(ics, id, temp);
 	    ROS_INFO("%s: %d", __func__, this->temp_limit);
 	}
     }
@@ -177,8 +178,8 @@ class KondoDriver : public hardware_interface::RobotHW
     // Hardware interface
     hardware_interface::JointStateInterface jnt_state_interface;
     hardware_interface::PositionJointInterface jnt_pos_interface;
-    // ICS hardware resource
-    ICSData ics;
+    // B3M hardware resource
+    B3MData b3m;
     // Vector of motors
     std::vector<boost::shared_ptr<KondoMotor> > actuator_vector;
   public:
@@ -195,15 +196,15 @@ class KondoDriver : public hardware_interface::RobotHW
 	    }
 	}
 	if (!loopback) {
-	    // Initiallize ICS interface
-	    if (ics_init(&ics, product_id) < 0) {
-		ROS_ERROR ("Could not init ICS: %s\n", ics.error);
+	    // Initiallize B3M interface
+	    if (b3m_init(&b3m, product_id) < 0) {
+		ROS_ERROR ("Could not init B3M: %s\n", b3m.error);
 		exit(0);
 	    }
 	}
 	// Load atuators
 	for (int i=0; i<num; i++) {
-	    boost::shared_ptr<KondoMotor> actuator(new KondoMotor(&ics, std::string(actuators[i]), jnt_state_interface, jnt_pos_interface, loopback));
+	    boost::shared_ptr<KondoMotor> actuator(new KondoMotor(&b3m, std::string(actuators[i]), jnt_state_interface, jnt_pos_interface, loopback));
 	    actuator_vector.push_back(actuator);
 	}
 	registerInterface(&jnt_state_interface);
@@ -218,7 +219,7 @@ class KondoDriver : public hardware_interface::RobotHW
     }
     ~KondoDriver () {
 	if (!loopback) {
-	    ics_close (&ics);
+	    b3m_close (&b3m);
 	}
     }
     ros::Time getTime() const {return ros::Time::now();}
