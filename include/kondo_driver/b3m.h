@@ -50,6 +50,10 @@
 #define B3M_RETURN_UART_STATUS		0x011
 #define B3M_RETURN_COMMAND_STATUS	0x100
 
+#define B3M_CMD_ID	0
+#define B3M_CMD_GET	0
+#define B3M_CMD_SET	0
+
 #define B3M_SC_EEPROM  0
 #define B3M_SC_STRETCH 1
 #define B3M_SC_SPEED   2

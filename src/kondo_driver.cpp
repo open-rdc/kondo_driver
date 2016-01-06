@@ -165,7 +165,7 @@ public:
 	if (loopback) {
 	    temp_limit = temp;
 	}else {
-	    this->temp_limit = b3m_set_temperature_limit(ics, id, temp);
+	    this->temp_limit = b3m_set_temperature_limit(b3m, id, temp);
 	    ROS_INFO("%s: %d", __func__, this->temp_limit);
 	}
     }
