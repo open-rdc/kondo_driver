@@ -1,5 +1,4 @@
-# product_id: 0x0008 # Dual adapter HS
-product_id: 0x0006 # ICS adapter HS
+product_id: 0x0009 # RS485USB
 
 joint_0_driver:
   joint_name: joint_0
@@ -11,12 +10,12 @@ joint_0_driver:
   current_limit: 30
   temperature_limit: 80
 
-joint_1_driver:
-  joint_name: joint_1
-  id: 1
-  min_angle: -135
-  max_angle:  135
-  stretch: 60
-  speed: 127
-  current_limit: 30
-  temperature_limit: 80
+#joint_1_driver:
+#  joint_name: joint_1
+#  id: 1
+#  min_angle: -135
+#  max_angle:  135
+#  stretch: 60
+#  speed: 127
+#  current_limit: 30
+#  temperature_limit: 80
