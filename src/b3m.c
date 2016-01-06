@@ -225,6 +225,7 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
 {
 	assert(r);
 	int i;
+	int sum = 0, time = 0;
 
 	// check for valid data
 	if (id > 31)
@@ -241,7 +242,7 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
 	r->swap[5] = pos >> 8;					// pos high
 	r->swap[6] = time &0xff;				// time low
 	r->swap[7] = time >> 8;					// time high
-	for(int i = 0, sum = 0; i < 8; i ++){
+	for(i = 0, sum = 0; i < 8; i ++){
 		sum += r->swap[i];
 	}
 	r->swap[8] = sum & 0xff;

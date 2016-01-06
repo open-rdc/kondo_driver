@@ -12,6 +12,7 @@
 #include "hardware_interface/robot_hw.h"
 extern "C" {
 #include "kondo_driver/ics.h"
+#include "kondo_driver/b3m.h"
 }
 #include "kondo_driver/setPower.h"
 
