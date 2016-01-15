@@ -27,7 +27,7 @@
 #include "ftdi.h"
 
 // some options
-#define B3M_BAUD 1500000
+//#define B3M_BAUD 1500000
 #define B3M_USB_VID 0x165c
 #define B3M_USB_PID 0x0009  // setting for RS485USB
 #define B3M_RX_TIMEOUT 1000000
@@ -35,6 +35,8 @@
 #define B3M_GET_TIMEOUT 2000
 #define B3M_SET_TIMEOUT 2000
 #define B3M_ID_TIMEOUT 2000
+
+#define B3M_BAUD B1500000
 
 // b3m commands
 #define B3M_CMD_LOAD		0x01
@@ -44,11 +46,11 @@
 #define B3M_CMD_POSITION	0x06
 #define B3M_CMD_RESET		0x05
 
-#define B3M_RETURN_ERROR_STATUS		0x000
-#define B3M_RETURN_SYSTEM_STATUS	0x001
-#define B3M_RETURN_MOTOR_STATUS		0x010
-#define B3M_RETURN_UART_STATUS		0x011
-#define B3M_RETURN_COMMAND_STATUS	0x100
+#define B3M_RETURN_ERROR_STATUS		0x00
+#define B3M_RETURN_SYSTEM_STATUS	0x01
+#define B3M_RETURN_MOTOR_STATUS		0x02
+#define B3M_RETURN_UART_STATUS		0x03
+#define B3M_RETURN_COMMAND_STATUS	0x04
 
 #define B3M_CMD_ID	0
 #define B3M_CMD_GET	0
@@ -75,6 +77,7 @@ typedef unsigned int UINT;
 // instance data for kondo library
 typedef struct
 {
+	int fd;
 	struct ftdi_context ftdic; // ftdi context
 	UCHAR swap[128]; // swap space output
 	char error[128]; // error messages
@@ -82,7 +85,7 @@ typedef struct
 } B3MData;
 
 // low level comms
-int b3m_init(B3MData * r, int product_id);
+int b3m_init(B3MData * r, const char* serial_port);
 int b3m_close(B3MData * r);
 int b3m_write(B3MData * r, int n);
 int b3m_read(B3MData * r, int n);

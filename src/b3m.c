@@ -17,6 +17,13 @@
  * limitations under the License.
  */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
+
 #include "kondo_driver/b3m.h"
 
 /*-----------------------------------------------------------------------------
@@ -33,41 +40,55 @@
 /*-----------------------------------------------------------------------------
  * Iniitialize the B3M interface
  * Here we mainly setup the FTDI USB-to-serial communication
- * 115200 baud, 8 bits, even parity, 1 stop bit.
+ * 1500000 baud, 8 bits, even parity, 1 stop bit.
  * Returns: 0 if successful, < 0 otherwise
  */
-int b3m_init(B3MData * r, int product_id)
+int b3m_init(B3MData * r, const char* serial_port)
 {
+	printf("b3m_init\n");
 	assert(r);
-	r->debug = 0;
+	r->debug = 1;
+
+//	int product_id = 0x0006;
 
 	// init usb
-	if (ftdi_init(&r->ftdic) < 0) {
-	    fprintf (stderr, "init");
-		b3m_ftdi_error(r);
-	}
+//	if (ftdi_init(&r->ftdic) < 0) {
+//	    fprintf (stderr, "init");
+//		b3m_ftdi_error(r);
+//	}
 	// select first interface
-	if (ftdi_set_interface(&r->ftdic, INTERFACE_A) < 0) {
-	    fprintf (stderr, "set_interface");
-	    b3m_ftdi_error(r);
-	}
+//	if (ftdi_set_interface(&r->ftdic, INTERFACE_A) < 0) {
+//	    fprintf (stderr, "set_interface");
+//	    b3m_ftdi_error(r);
+//	}
 	// open usb device
-	if (ftdi_usb_open(&r->ftdic, B3M_USB_VID, product_id) < 0) {
-	    fprintf (stderr, "open");
-	    b3m_ftdi_error(r);
-	}
+//	if (ftdi_usb_open(&r->ftdic, B3M_USB_VID, product_id) < 0) {
+//	    fprintf (stderr, "open");
+//	    b3m_ftdi_error(r);
+//	}
 
 	// set baud rate
-	if (ftdi_set_baudrate(&r->ftdic, B3M_BAUD) < 0) {
-	    fprintf (stderr, "baud");
-		b3m_ftdi_error(r);
-		}
+//	if (ftdi_set_baudrate(&r->ftdic, 1500000) < 0) {
+//	    fprintf (stderr, "baud");
+//		b3m_ftdi_error(r);
+//	}
 	// set line parameters (8E1)
-	if (ftdi_set_line_property(&r->ftdic, BITS_8, STOP_BIT_1, EVEN) < 0) {
-	    fprintf (stderr, "param");
-		b3m_ftdi_error(r);
-		}
+//	if (ftdi_set_line_property(&r->ftdic, BITS_8, STOP_BIT_1, EVEN) < 0) {
+//	    fprintf (stderr, "param");
+//		b3m_ftdi_error(r);
+//	}
 
+	struct termios tio;
+
+	r->fd = open(serial_port, O_RDWR);
+	if (ioctl(r->fd, TCGETS, &tio)){
+		fprintf(stderr, "Error: Get serial port parameters\n");
+	}
+	tio.c_cflag &= ~CBAUD;
+	tio.c_cflag |= B1500000;
+	if (ioctl(r->fd, TCSETS, &tio)){
+		fprintf(stderr, "Error: Set serial port parameters\n");
+	}
 	return 0;
 }
 
@@ -78,14 +99,17 @@ int b3m_init(B3MData * r, int product_id)
  */
 int b3m_close(B3MData * r)
 {
+	printf("b3m_close\n");
 	assert(r);
 
 	// close usb device
-	if (ftdi_usb_close(&r->ftdic) < 0)
-		b3m_ftdi_error(r);
+//	if (ftdi_usb_close(&r->ftdic) < 0)
+//		b3m_ftdi_error(r);
 
 	// deinit
-	ftdi_deinit(&r->ftdic);
+//	ftdi_deinit(&r->ftdic);
+
+	close(r->fd);
 
 	return 0;
 }
@@ -96,10 +120,13 @@ int b3m_close(B3MData * r)
  */
 int b3m_write(B3MData * r, int n)
 {
+	printf("b3m_write\n");
 	assert(r);
 	int i;
-	if ((i = ftdi_write_data(&r->ftdic, r->swap, n)) < 0)
-		b3m_ftdi_error(r);
+	if ((i = write(r->fd, r->swap, n)) < 0)
+		fprintf(stderr, "Error: Send data\n");
+//	if ((i = ftdi_write_data(&r->ftdic, r->swap, n)) < 0)
+//		b3m_ftdi_error(r);
 	return i;
 }
 /*-----------------------------------------------------------------------------
@@ -110,10 +137,13 @@ int b3m_write(B3MData * r, int n)
  */
 int b3m_read(B3MData * r, int n)
 {
+	printf("b3m_read\n");
 	assert(r);
 	int i;
-	if ((i = ftdi_write_data(&r->ftdic, r->swap, n)) < 0)
-		b3m_ftdi_error(r);
+	if ((i = read(r->fd, r->swap, n)) < 0)
+		fprintf(stderr, "Error: Read data\n");
+//	if ((i = ftdi_write_data(&r->ftdic, r->swap, n)) < 0)
+//		b3m_ftdi_error(r);
 	return i;
 }
 /*-----------------------------------------------------------------------------
@@ -125,6 +155,7 @@ int b3m_read(B3MData * r, int n)
  */
 int b3m_read_timeout(B3MData * r, int n, long usecs)
 {
+	printf("b3m_read_timeout\n");
 	assert(r);
 	static struct timeval tv, end;
 	int i = 0, bytes_read = 0;
@@ -138,8 +169,8 @@ int b3m_read_timeout(B3MData * r, int n, long usecs)
 	}
 	// spam the read until data arrives
 	do {
-	    if ((i = ftdi_read_data(&r->ftdic, r->swap, n - bytes_read)) < 0) {
-		b3m_ftdi_error(r);
+	    if ((i = read(&r->fd, r->swap, n - bytes_read)) < 0) {
+		fprintf(stderr, "Error: Read data\n");
 	    }
 	    bytes_read += i;
 	    gettimeofday(&tv, NULL);
@@ -153,9 +184,11 @@ int b3m_read_timeout(B3MData * r, int n, long usecs)
  */
 int b3m_purge(B3MData * r)
 {
+	printf("b3m_purge\n");
 	assert(r);
-	if (ftdi_usb_purge_buffers(&r->ftdic) < 0)
-		b3m_ftdi_error(r);
+//	if (ftdi_usb_purge_buffers(&r->ftdic) < 0)
+//		b3m_ftdi_error(r);
+	tcflush(r->fd, TCIOFLUSH);
 	return 0;
 }
 
@@ -223,6 +256,7 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout)
  */
 int b3m_pos(B3MData * r, UINT id, UINT pos)
 {
+	printf("b3m_pos\n");
 	assert(r);
 	int i;
 	int sum = 0, time = 0;
@@ -263,6 +297,7 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
  */
 int b3m_hold(B3MData * r, UINT id)
 {
+	printf("b3m_hold\n");
 	return b3m_pos(r, id, 16383);
 }
 
@@ -274,6 +309,7 @@ int b3m_hold(B3MData * r, UINT id)
  */
 int b3m_free(B3MData * r, UINT id)
 {
+	printf("b3m_free\n");
 	return b3m_pos(r, id, 0);
 }
 
@@ -284,6 +320,7 @@ int b3m_free(B3MData * r, UINT id)
  */
 int b3m_get_stretch(B3MData * r, UINT id)
 {
+	printf("b3m_get_stretch\n");
 	assert(r);
 	int i;
 
@@ -310,6 +347,7 @@ int b3m_get_stretch(B3MData * r, UINT id)
  */
 int b3m_get_speed(B3MData * r, UINT id)
 {
+	printf("b3m_get_speed\n");
 	assert(r);
 	int i;
 
@@ -336,6 +374,7 @@ int b3m_get_speed(B3MData * r, UINT id)
  */
 int b3m_get_current(B3MData * r, UINT id)
 {
+	printf("b3m_get_current\n");
 	assert(r);
 	int i;
 
@@ -363,6 +402,7 @@ int b3m_get_current(B3MData * r, UINT id)
  */
 int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch)
 {
+	printf("b3m_set_stretch\n");
 	assert(r);
 	int i;
 
@@ -392,6 +432,7 @@ int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch)
  */
 int b3m_set_speed(B3MData * r, UINT id, UCHAR speed)
 {
+	printf("b3m_set_speed\n");
 	assert(r);
 	int i;
 
@@ -420,6 +461,7 @@ int b3m_set_speed(B3MData * r, UINT id, UCHAR speed)
  */
 int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim)
 {
+	printf("b3m_set_current_limit\n");
 	assert(r);
 	int i;
 
@@ -449,6 +491,7 @@ int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim)
  */
 int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim)
 {
+	printf("b3m_set_temperature_limit\n");
 	assert(r);
 	int i;
 
@@ -477,6 +520,7 @@ int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim)
  */
 int b3m_get_id(B3MData * r)
 {
+	printf("b3m_get_id\n");
 	assert(r);
 	int i;
 
@@ -502,6 +546,7 @@ int b3m_get_id(B3MData * r)
  */
 int b3m_set_id(B3MData * r, UINT id)
 {
+	printf("b3m_set_id\n");
 	assert(r);
 	int i;
 
