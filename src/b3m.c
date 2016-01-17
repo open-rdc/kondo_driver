@@ -49,35 +49,6 @@ int b3m_init(B3MData * r, const char* serial_port)
 	assert(r);
 	r->debug = 1;
 
-//	int product_id = 0x0006;
-
-	// init usb
-//	if (ftdi_init(&r->ftdic) < 0) {
-//	    fprintf (stderr, "init");
-//		b3m_ftdi_error(r);
-//	}
-	// select first interface
-//	if (ftdi_set_interface(&r->ftdic, INTERFACE_A) < 0) {
-//	    fprintf (stderr, "set_interface");
-//	    b3m_ftdi_error(r);
-//	}
-	// open usb device
-//	if (ftdi_usb_open(&r->ftdic, B3M_USB_VID, product_id) < 0) {
-//	    fprintf (stderr, "open");
-//	    b3m_ftdi_error(r);
-//	}
-
-	// set baud rate
-//	if (ftdi_set_baudrate(&r->ftdic, 1500000) < 0) {
-//	    fprintf (stderr, "baud");
-//		b3m_ftdi_error(r);
-//	}
-	// set line parameters (8E1)
-//	if (ftdi_set_line_property(&r->ftdic, BITS_8, STOP_BIT_1, EVEN) < 0) {
-//	    fprintf (stderr, "param");
-//		b3m_ftdi_error(r);
-//	}
-
 	struct termios tio;
 
 	r->fd = open(serial_port, O_RDWR);
@@ -102,13 +73,6 @@ int b3m_close(B3MData * r)
 	printf("b3m_close\n");
 	assert(r);
 
-	// close usb device
-//	if (ftdi_usb_close(&r->ftdic) < 0)
-//		b3m_ftdi_error(r);
-
-	// deinit
-//	ftdi_deinit(&r->ftdic);
-
 	close(r->fd);
 
 	return 0;
@@ -125,8 +89,6 @@ int b3m_write(B3MData * r, int n)
 	int i;
 	if ((i = write(r->fd, r->swap, n)) < 0)
 		fprintf(stderr, "Error: Send data\n");
-//	if ((i = ftdi_write_data(&r->ftdic, r->swap, n)) < 0)
-//		b3m_ftdi_error(r);
 	return i;
 }
 /*-----------------------------------------------------------------------------
@@ -142,8 +104,6 @@ int b3m_read(B3MData * r, int n)
 	int i;
 	if ((i = read(r->fd, r->swap, n)) < 0)
 		fprintf(stderr, "Error: Read data\n");
-//	if ((i = ftdi_write_data(&r->ftdic, r->swap, n)) < 0)
-//		b3m_ftdi_error(r);
 	return i;
 }
 /*-----------------------------------------------------------------------------
@@ -186,8 +146,6 @@ int b3m_purge(B3MData * r)
 {
 	printf("b3m_purge\n");
 	assert(r);
-//	if (ftdi_usb_purge_buffers(&r->ftdic) < 0)
-//		b3m_ftdi_error(r);
 	tcflush(r->fd, TCIOFLUSH);
 	return 0;
 }
@@ -261,15 +219,23 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
 	int i;
 	int sum = 0, time = 0;
 
-	// check for valid data
-	if (id > 31)
-		b3m_error(r, "Invalid servo ID > 31.");
-	if (pos > 16383)
-		b3m_error(r, "Invalid servo position > 16383.");
-
 	// build command
-	r->swap[0] = 0x09;						// length
-	r->swap[1] = B3M_CMD_POSITION;			// command
+//	r->swap[0] = 0x09;						// length
+//	r->swap[1] = B3M_CMD_POSITION;			// command
+//	r->swap[2] = B3M_RETURN_MOTOR_STATUS;	// option
+//	r->swap[3] = id;						// id
+//	r->swap[4] = pos & 0xff;				// pos low
+//	r->swap[5] = pos >> 8;					// pos high
+//	r->swap[6] = time &0xff;				// time low
+//	r->swap[7] = time >> 8;					// time high
+//	for(i = 0, sum = 0; i < 8; i ++){
+//		sum += r->swap[i];
+//	}
+//	r->swap[8] = sum & 0xff;
+	
+	// build command
+	r->swap[0] = 0x08;						// length
+	r->swap[1] = B3M_CMD_WRITE;				// command
 	r->swap[2] = B3M_RETURN_MOTOR_STATUS;	// option
 	r->swap[3] = id;						// id
 	r->swap[4] = pos & 0xff;				// pos low
@@ -280,7 +246,7 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
 		sum += r->swap[i];
 	}
 	r->swap[8] = sum & 0xff;
-	
+
 	// synchronize with servo
 	if ((i = b3m_trx_timeout(r, 9, 7, B3M_POS_TIMEOUT)) < 0)
 		return i;
