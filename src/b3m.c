@@ -131,7 +131,7 @@ int b3m_read_timeout(B3MData * r, int n, long usecs)
 	}
 	// spam the read until data arrives
 	do {
-	    if ((i = read(&r->fd, r->swap, n - bytes_read)) < 0) {
+	    if ((i = read(r->fd, r->swap, n - bytes_read)) < 0) {
 		fprintf(stderr, "Error: Read data\n");
 	    }
 	    bytes_read += i;
