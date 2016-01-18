@@ -22,6 +22,7 @@ const int MAX_PULSE = 11500;
 const int MIN_PULSE = 3500;
 const int CNT_PULSE = 7500;
 const double RADIAN_PER_PULSE = 270.0*M_PI/(MAX_PULSE-MIN_PULSE)/180.0;
+const double RAD_TO_DEG = 180.0/M_PI*100;
 
 double pulse_to_radian (double pulse)
 {
@@ -31,6 +32,16 @@ double pulse_to_radian (double pulse)
 int radian_to_pulse (double radian)
 {
     return CNT_PULSE + radian/RADIAN_PER_PULSE;
+}
+
+int deg100_to_radian (double deg100)
+{
+    return deg100/RAD_TO_DEG;
+}
+
+int radian_to_deg100 (double radian)
+{
+    return radian*RAD_TO_DEG;
 }
 
 class KondoMotor {
@@ -111,28 +122,28 @@ public:
 		if (cmd > max_angle*3.14/180) {
 			cmd = max_angle;
 		}
-		if (motor_power == true) {
-			pulse_cmd = radian_to_pulse(cmd);
-		}
+//		if (motor_power == true) {
+			pulse_cmd = radian_to_deg100(cmd);
+//		}
 		if (loopback) {
 			pos = cmd;
 			eff = 0;
 		}else{
 			int pulse_ret = 0;
-		pulse_ret= b3m_pos(b3m, id, pulse_cmd);
+			pulse_ret= b3m_pos(b3m, id, pulse_cmd);
 			if (pulse_ret > 0) {
-			pos = pulse_to_radian (pulse_ret);
+				pos = deg100_to_radian (pulse_ret);
 			}
 			/* how can I get speed ? */
 			vel = 0;
 			/* get servo current */
 			int current = b3m_get_current(b3m, id);
 			if (current > 0) {
-			if (current < 64) {
-				eff = current;
-			} else {
-				eff = - (current - 64);
-			}
+				if (current < 64) {
+					eff = current;
+				} else {
+					eff = - (current - 64);
+				}
 			}
 		}
     }

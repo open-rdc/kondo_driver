@@ -350,6 +350,7 @@ int b3m_get_speed(B3MData * r, UINT id)
  */
 int b3m_get_current(B3MData * r, UINT id)
 {
+/*
 	printf("b3m_get_current\n");
 	assert(r);
 	int i;
@@ -368,6 +369,8 @@ int b3m_get_current(B3MData * r, UINT id)
 
 	// return stretch
 	return r->swap[4];
+*/
+	return 0;
 }
 
 /*-----------------------------------------------------------------------------
