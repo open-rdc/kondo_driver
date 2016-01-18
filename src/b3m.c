@@ -40,7 +40,7 @@
 /*-----------------------------------------------------------------------------
  * Iniitialize the B3M interface
  * Here we mainly setup the FTDI USB-to-serial communication
- * 1500000 baud, 8 bits, even parity, 1 stop bit.
+ * 115200 baud, 8 bits, even parity, 1 stop bit.
  * Returns: 0 if successful, < 0 otherwise
  */
 int b3m_init(B3MData * r, const char* serial_port)
@@ -56,7 +56,7 @@ int b3m_init(B3MData * r, const char* serial_port)
 		fprintf(stderr, "Error: Get serial port parameters\n");
 	}
 	tio.c_cflag &= ~CBAUD;
-	tio.c_cflag |= B1500000;
+	tio.c_cflag |= B3M_BAUD;
 	if (ioctl(r->fd, TCSETS, &tio)){
 		fprintf(stderr, "Error: Set serial port parameters\n");
 	}
@@ -91,6 +91,7 @@ int b3m_write(B3MData * r, int n)
 		fprintf(stderr, "Error: Send data\n");
 	return i;
 }
+
 /*-----------------------------------------------------------------------------
  * Read n bytes from B3M. Reads immediately from the serial buffer.
  * See b3m_read_timeout for a version that blocks waiting for the data.
@@ -106,6 +107,7 @@ int b3m_read(B3MData * r, int n)
 		fprintf(stderr, "Error: Read data\n");
 	return i;
 }
+
 /*-----------------------------------------------------------------------------
  * Read n bytes from the B3M, waiting for at most usecs for the n bytes.
  * Performs this by continuously polling the serial buffer until either
@@ -206,104 +208,112 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout)
 
 /*-----------------------------------------------------------------------------
  * Set servo position
- * id: the servo id, 0-31
- * pos: the position to set, 0-16383
+ * id: the servo id, 0-255 (255: broadcast)
+ * pos: the position to set (angle * 100)
  * to free the servo, pos = 0
  * to hold the servo, pos = 16383
- * Returns current position >= 0, or < 0 if error.
+ * Returns error status.
  */
 int b3m_pos(B3MData * r, UINT id, UINT pos)
 {
 	printf("b3m_pos\n");
 	assert(r);
+
 	int i;
 	int sum = 0, time = 0;
 
 	// build command
-//	r->swap[0] = 0x09;						// length
-//	r->swap[1] = B3M_CMD_POSITION;			// command
-//	r->swap[2] = B3M_RETURN_MOTOR_STATUS;	// option
-//	r->swap[3] = id;						// id
-//	r->swap[4] = pos & 0xff;				// pos low
-//	r->swap[5] = pos >> 8;					// pos high
-//	r->swap[6] = time &0xff;				// time low
-//	r->swap[7] = time >> 8;					// time high
-//	for(i = 0, sum = 0; i < 8; i ++){
-//		sum += r->swap[i];
-//	}
-//	r->swap[8] = sum & 0xff;
-	
-	// build command
-	r->swap[0] = 0x08;						// length
+	r->swap[0] = 0x09;						// length
 	r->swap[1] = B3M_CMD_WRITE;				// command
-	r->swap[2] = B3M_RETURN_MOTOR_STATUS;	// option
+	r->swap[2] = B3M_RETURN_ERROR_STATUS;	// option
 	r->swap[3] = id;						// id
 	r->swap[4] = pos & 0xff;				// pos low
 	r->swap[5] = pos >> 8;					// pos high
-	r->swap[6] = time &0xff;				// time low
-	r->swap[7] = time >> 8;					// time high
+	r->swap[6] = B3M_SERVO_DESIRED_POSITION;
+	r->swap[7] = 0x01;						// number of ID
 	for(i = 0, sum = 0; i < 8; i ++){
 		sum += r->swap[i];
 	}
 	r->swap[8] = sum & 0xff;
 
 	// synchronize with servo
-	if ((i = b3m_trx_timeout(r, 9, 7, B3M_POS_TIMEOUT)) < 0)
+	if ((i = b3m_trx_timeout(r, 9, 5, B3M_POS_TIMEOUT)) < 0)
 		return i;
 
-	// return the position
-	return ((r->swap[5] & 0xFF) << 7) | (r->swap[4] & 0xFF);
+	// return error status
+	return (r->swap[2] & 0xFF);
 }
 
 /*-----------------------------------------------------------------------------
  * Hold servo position
  * This tells the servo to stop and maintain the current position.
- * id: the servo id, 0-31
+ * id: the servo id, 0-255
  * Returns current position >= 0, or < 0 if error.
  */
 int b3m_hold(B3MData * r, UINT id)
 {
 	printf("b3m_hold\n");
-	return b3m_pos(r, id, 16383);
+	assert(r);
+
+	int i;
+	int sum = 0, time = 0;
+
+	// build command
+	r->swap[0] = 0x09;						// length
+	r->swap[1] = B3M_CMD_WRITE;				// command
+	r->swap[2] = B3M_RETURN_ERROR_STATUS;	// option
+	r->swap[3] = id;						// id
+	r->swap[4] = B3M_OPTIONS_RUN_HOLD;		// mode
+	r->swap[5] = 0x00;						// interpolation
+	r->swap[6] = B3M_SERVO_SERVO_MODE;
+	r->swap[7] = 0x01;						// number of ID
+	for(i = 0, sum = 0; i < 8; i ++){
+		sum += r->swap[i];
+	}
+	r->swap[8] = sum & 0xff;
+
+	// synchronize with servo
+	if ((i = b3m_trx_timeout(r, 9, 5, B3M_POS_TIMEOUT)) < 0)
+		return i;
+
+	// return error status
+	return (r->swap[2] & 0xFF);
 }
 
 /*-----------------------------------------------------------------------------
- * Free servo position
+ * Set servo mode
  * This tells the servo to stop and relax (power off motor)
  * id: the servo id, 0-31
  * Returns the current position >= 0, or < 0 if error.
  */
-int b3m_free(B3MData * r, UINT id)
+int b3m_servo_mode(B3MData * r, UINT id, UCHAR option)
 {
-	printf("b3m_free\n");
-	return b3m_pos(r, id, 0);
-}
-
-/*-----------------------------------------------------------------------------
- * Get servo stretch
- * id: the servo id, 0-31
- * Returns: Value of stretch (>= 0) if successful, < 0 if error
- */
-int b3m_get_stretch(B3MData * r, UINT id)
-{
-	printf("b3m_get_stretch\n");
+	printf("b3m_servo_mode\n");
 	assert(r);
-	int i;
 
-	// check valid id
-	if (id > 31)
-		b3m_error(r, "Invalid servo ID > 31.");
+	int i;
+	int sum = 0, time = 0;
 
 	// build command
-	r->swap[0] = id | B3M_CMD_GET; // id and command
-	r->swap[1] = B3M_SC_STRETCH; // subcommand
+	r->swap[0] = 0x09;						// length
+	r->swap[1] = B3M_CMD_WRITE;				// command
+	r->swap[2] = B3M_RETURN_ERROR_STATUS;	// option
+	r->swap[3] = id;						// id
+	r->swap[4] = option;					// mode
+	r->swap[5] = 0x00;						// interpolation
+	r->swap[6] = B3M_SERVO_SERVO_MODE;
+	r->swap[7] = 0x01;						// number of ID
+	for(i = 0, sum = 0; i < 8; i ++){
+		sum += r->swap[i];
+	}
+	r->swap[8] = sum & 0xff;
 
-	// synchronize
-	if ((i = b3m_trx_timeout(r, 2, 5, B3M_GET_TIMEOUT)) < 0)
+	// synchronize with servo
+	if ((i = b3m_trx_timeout(r, 9, 5, B3M_POS_TIMEOUT)) < 0)
 		return i;
 
-	// return stretch
-	return r->swap[4];
+	// return error status
+	return (r->swap[2] & 0xFF);
 }
 
 /*-----------------------------------------------------------------------------
@@ -368,6 +378,7 @@ int b3m_get_current(B3MData * r, UINT id)
  */
 int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch)
 {
+/*
 	printf("b3m_set_stretch\n");
 	assert(r);
 	int i;
@@ -388,6 +399,8 @@ int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch)
 		return i;
 
 	return r->swap[5];
+*/
+	return 0;
 }
 
 /*-----------------------------------------------------------------------------
@@ -398,6 +411,7 @@ int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch)
  */
 int b3m_set_speed(B3MData * r, UINT id, UCHAR speed)
 {
+/*
 	printf("b3m_set_speed\n");
 	assert(r);
 	int i;
@@ -418,6 +432,8 @@ int b3m_set_speed(B3MData * r, UINT id, UCHAR speed)
 		return i;
 
 	return r->swap[5];
+*/
+	return 0;
 }
 /*-----------------------------------------------------------------------------
  * Set current limit parameter of the servo
@@ -457,6 +473,7 @@ int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim)
  */
 int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim)
 {
+/*
 	printf("b3m_set_temperature_limit\n");
 	assert(r);
 	int i;
@@ -477,6 +494,8 @@ int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim)
 		return i;
 
 	return r->swap[5];
+*/
+	return 0;
 }
 
 /*-----------------------------------------------------------------------------

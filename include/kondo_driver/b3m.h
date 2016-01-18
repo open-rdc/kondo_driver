@@ -27,7 +27,7 @@
 #include "ftdi.h"
 
 // some options
-//#define B3M_BAUD 1500000
+//#define B3M_BAUD 115200
 #define B3M_USB_VID 0x165c
 #define B3M_USB_PID 0x0009  // setting for RS485USB
 #define B3M_RX_TIMEOUT 1000000
@@ -36,7 +36,7 @@
 #define B3M_SET_TIMEOUT 2000
 #define B3M_ID_TIMEOUT 2000
 
-#define B3M_BAUD B1500000
+#define B3M_BAUD B115200
 
 // b3m commands
 #define B3M_CMD_LOAD					0x01
@@ -140,6 +140,19 @@
 #define B3M_CONFIG_ENC_OFFSET_CENTER	0xAE
 #define B3M_CONFIG_ENC_OFFSET			0xB0
 
+#define B3M_OPTIONS_RUN_NORMAL			0x00
+#define B3M_OPTIONS_RUN_FREE			0x02
+#define B3M_OPTIONS_RUN_HOLD			0x03
+#define B3M_OPTIONS_CONTROL_POSITION	0x00
+#define B3M_OPTIONS_CONTROL_VELOCITY	0x04
+#define B3M_OPTIONS_CONTROL_TORQUE		0x08
+#define B3M_OPTIONS_CONTROL_FFORWARD	0x0C
+#define B3M_OPTIONS_SERVO_NORMAL		0x00
+#define B3M_OPTIONS_SERVO_CLONE			0x40
+#define B3M_OPTIONS_SERVO_REVERSE		0x80
+
+
+
 #define B3M_CMD_ID	0
 #define B3M_CMD_GET	0
 #define B3M_CMD_SET	0
@@ -151,6 +164,8 @@
 #define B3M_SC_TEMPERATURE 4
 #define B3M_SC_READ 0
 #define B3M_SC_WRITE 1
+
+
 
 #ifndef __UCHAR__
 #define __UCHAR__
@@ -186,6 +201,7 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout);
 int b3m_pos(B3MData * r, UINT id, UINT pos);
 int b3m_hold(B3MData * r, UINT id);
 int b3m_free(B3MData * r, UINT id);
+int b3m_servo_mode(B3MData * r, UINT id, UCHAR option);
 
 // servo setting commands
 int b3m_get_stretch(B3MData * r, UINT id);

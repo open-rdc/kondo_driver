@@ -67,7 +67,7 @@ public:
 		}
 		if (!loopback) {
 			// Check motor existence
-			if (b3m_pos(b3m, id, 0) <= 0) {
+			if (b3m_servo_mode(b3m, id, B3M_OPTIONS_RUN_NORMAL) <= 0) {
 			ROS_WARN("Cannot connect to servo ID: %d", id);
 			}
 		}
@@ -145,9 +145,10 @@ public:
 			this->speed = b3m_set_speed(b3m, id, speed);
 			ROS_INFO("%s: %d", __func__, this->speed);
 		}
-		}
-		// Set strech parameter
-		void set_stretch (unsigned char stretch) {
+	}
+
+	// Set strech parameter
+	void set_stretch (unsigned char stretch) {
 		if (loopback) {
 			this->stretch = stretch;
 		}else {
