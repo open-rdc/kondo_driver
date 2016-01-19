@@ -199,13 +199,10 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout);
 
 // position commands
 int b3m_pos(B3MData * r, UINT id, UINT pos);
-int b3m_hold(B3MData * r, UINT id);
-int b3m_free(B3MData * r, UINT id);
 int b3m_servo_mode(B3MData * r, UINT id, UCHAR option);
 
 // servo setting commands
 int b3m_get_stretch(B3MData * r, UINT id);
-int b3m_get_speed(B3MData * r, UINT id);
 int b3m_get_current(B3MData * r, UINT id);
 int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch);
 int b3m_set_speed(B3MData * r, UINT id, UCHAR speed);
