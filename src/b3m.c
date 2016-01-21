@@ -32,10 +32,6 @@
 #define b3m_error(ki, err) { \
   snprintf(ki->error, 128, "ERROR: %s: %s\n", __func__, err); \
   return -1; }
-#define b3m_ftdi_error(ki) { \
-  snprintf(ki->error, 128, "ERROR: %s: %s\n", __func__, \
-    ftdi_get_error_string(&ki->ftdic)); \
-  return -1; }
 
 /*-----------------------------------------------------------------------------
  * Iniitialize the B3M interface
@@ -206,7 +202,17 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout)
 	return i;
 }
 
-int b3m_com_send(B3MData * r, UINT id, UINT address, UCHAR *value, int byte)
+
+/*!
+ * @brief send command to servo motors
+ *
+ * @param[in] id servo id, 0-255 (255: broadcast)
+ * @param[in] address servo address
+ * @param[in] data servo data
+ * @param[in] byte byte of data
+ * @return error status
+ */
+int b3m_com_send(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
 {
 	assert(r);
 
@@ -219,7 +225,7 @@ int b3m_com_send(B3MData * r, UINT id, UINT address, UCHAR *value, int byte)
 	r->swap[n++] = B3M_RETURN_ERROR_STATUS;	// option
 	r->swap[n++] = id;						// id
 	for(i = 0; i < byte; i ++){
-		r->swap[n++] = value[i];
+		r->swap[n++] = data[i];
 	}
 	r->swap[n++] = address;
 	r->swap[n++] = 0x01;					// number of ID
@@ -236,12 +242,12 @@ int b3m_com_send(B3MData * r, UINT id, UINT address, UCHAR *value, int byte)
 	return r->swap[2];
 }
 
-
-/*-----------------------------------------------------------------------------
- * Set servo position
- * id: the servo id, 0-255 (255: broadcast)
- * pos: the position to set (angle * 100)
- * Returns error status.
+/*!
+ * @brief set servo position
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[in] pos the position to set (angle * 100)
+ * @return error status.
  */
 int b3m_pos(B3MData * r, UINT id, UINT pos)
 {
@@ -255,11 +261,12 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
 	return b3m_com_send(r, id, B3M_SERVO_DESIRED_POSITION, data, 2);
 }
 
-/*-----------------------------------------------------------------------------
- * Set servo mode
- * This tells the servo to stop and relax (power off motor)
- * id: the servo id, 0-31
- * Returns error status.
+/*!
+ * @brief set servo mode
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[in] option B3M_OPTIONS_*
+ * @return error status
  */
 int b3m_servo_mode(B3MData * r, UINT id, UCHAR option)
 {
