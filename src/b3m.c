@@ -214,12 +214,12 @@ int b3m_com_send(B3MData * r, UINT id, UINT address, UCHAR *value, int byte)
 	int sum = 0, time = 0;
 
 	// build command
-	r->swap[n++] = 0x09;					// length
+	r->swap[n++] = 7 + byte;				// length
 	r->swap[n++] = B3M_CMD_WRITE;			// command
 	r->swap[n++] = B3M_RETURN_ERROR_STATUS;	// option
 	r->swap[n++] = id;						// id
 	for(i = 0; i < byte; i ++){
-		r->swap[n++] = value[byte - i - 1];
+		r->swap[n++] = value[i];
 	}
 	r->swap[n++] = address;
 	r->swap[n++] = 0x01;					// number of ID
@@ -233,7 +233,7 @@ int b3m_com_send(B3MData * r, UINT id, UINT address, UCHAR *value, int byte)
 		return i;
 
 	// return error status
-	return (r->swap[2] & 0xFF);
+	return r->swap[2];
 }
 
 
@@ -248,33 +248,11 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
 	printf("b3m_pos\n");
 	assert(r);
 
-	return b3m_com_send(r, id, B3M_SERVO_DESIRED_POSITION, htons(pos), sizeof(short));
+	char data[2];
+	data[0] = pos & 0xff;
+	data[1] = pos >> 8;
 
-/*
-	int i;
-	int sum = 0, time = 0;
-
-	// build command
-	r->swap[0] = 0x09;						// length
-	r->swap[1] = B3M_CMD_WRITE;				// command
-	r->swap[2] = B3M_RETURN_ERROR_STATUS;	// option
-	r->swap[3] = id;						// id
-	r->swap[4] = pos & 0xff;				// pos low
-	r->swap[5] = pos >> 8;					// pos high
-	r->swap[6] = B3M_SERVO_DESIRED_POSITION;
-	r->swap[7] = 0x01;						// number of ID
-	for(i = 0, sum = 0; i < 8; i ++){
-		sum += r->swap[i];
-	}
-	r->swap[8] = sum & 0xff;
-
-	// synchronize with servo
-	if ((i = b3m_trx_timeout(r, 9, 5, B3M_POS_TIMEOUT)) < 0)
-		return i;
-
-	// return error status
-	return (r->swap[2] & 0xFF);
-*/
+	return b3m_com_send(r, id, B3M_SERVO_DESIRED_POSITION, data, 2);
 }
 
 /*-----------------------------------------------------------------------------
@@ -288,31 +266,12 @@ int b3m_servo_mode(B3MData * r, UINT id, UCHAR option)
 	printf("b3m_servo_mode\n");
 	assert(r);
 
-	int i;
-	int sum = 0, time = 0;
+	char data[2];
+	data[0] = option;						// mode
+	data[1] = 0x00;							// interpolation
 
-	// build command
-	r->swap[0] = 0x09;						// length
-	r->swap[1] = B3M_CMD_WRITE;				// command
-	r->swap[2] = B3M_RETURN_ERROR_STATUS;	// option
-	r->swap[3] = id;						// id
-	r->swap[4] = option;					// mode
-	r->swap[5] = 0x00;						// interpolation
-	r->swap[6] = B3M_SERVO_SERVO_MODE;
-	r->swap[7] = 0x01;						// number of ID
-	for(i = 0, sum = 0; i < 8; i ++){
-		sum += r->swap[i];
-	}
-	r->swap[8] = sum & 0xff;
-
-	// synchronize with servo
-	if ((i = b3m_trx_timeout(r, 9, 5, B3M_POS_TIMEOUT)) < 0)
-		return i;
-
-	// return error status
-	return (r->swap[2] & 0xFF);
+	return b3m_com_send(r, id, B3M_SERVO_SERVO_MODE, data, 2);
 }
-
 
 /*-----------------------------------------------------------------------------
  * Get servo current
