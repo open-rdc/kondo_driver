@@ -242,6 +242,48 @@ int b3m_com_send(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
 	return r->swap[2];
 }
 
+
+/*!
+ * @brief get status from servo motors
+ *
+ * @param[in] id servo id, 0-255 (255: broadcast)
+ * @param[in] address servo address
+ * @param[out] data servo data
+ * @param[in] byte byte of data
+ * @return error status
+ */
+int b3m_get_status(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
+{
+	assert(r);
+
+	int i, n = 0;
+	int sum = 0, time = 0;
+
+	// build command
+	r->swap[n++] = 0x07;					// length
+	r->swap[n++] = B3M_CMD_READ;			// command
+	r->swap[n++] = B3M_RETURN_ERROR_STATUS;	// option
+	r->swap[n++] = id;						// id
+	r->swap[n++] = address;
+	r->swap[n++] = 0x01;					// number of ID
+	for(i = 0; i < n; i ++){
+		sum += r->swap[i];
+	}
+	r->swap[n] = sum & 0xff;
+
+	// synchronize with servo
+	if ((i = b3m_trx_timeout(r, 7, 5 + byte, B3M_POS_TIMEOUT)) < 0)
+		return i;
+
+	for(i = 0; i < byte; i ++){
+		data[i] = r->swap[i + 4];
+	}
+
+	// return error status
+	return r->swap[2];
+}
+
+
 /*!
  * @brief set servo position
  *
@@ -260,6 +302,28 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
 
 	return b3m_com_send(r, id, B3M_SERVO_DESIRED_POSITION, data, 2);
 }
+
+
+/*!
+ * @brief set servo position
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[in] pos the position to set (angle * 100)
+ * @return error status.
+ */
+int b3m_get_pos(B3MData * r, UINT id, UINT pos)
+{
+	printf("b3m_get_pos\n");
+	assert(r);
+
+	char data[2];
+	if (b3m_get_status(r, id, B3M_SERVO_DESIRED_POSITION, data, 2)){
+		fprintf(stderr, "Error: get status\n");
+	}
+
+	return (int)((short)((data[1] << 8) + data[0]));
+}
+
 
 /*!
  * @brief set servo mode
