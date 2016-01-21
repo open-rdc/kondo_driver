@@ -175,18 +175,18 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout)
 	int i;
 	int j;
 
+	// debug printing
+	if (r->debug) {
+		printf("send %d bytes: ", bytes_out);
+		for (j = 0; j < bytes_out; j++)
+			printf("%x ", r->swap[j]);
+		printf("\n");
+	}
+
 	if ((i = b3m_purge(r)) < 0)
 		return i;
 	if ((i = b3m_write(r, bytes_out)) < 0)
 		return i;
-
-	// debug printing
-	if (r->debug) {
-		printf("send %d bytes: ", i);
-		for (j = 0; j < i; j++)
-			printf("%x ", r->swap[j]);
-		printf("\n");
-	}
 
 	// clear swap
 	for (i = 0; i < bytes_in; i++)
