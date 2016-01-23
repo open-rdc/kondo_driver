@@ -31,6 +31,7 @@ int target_deg100[256];
 // Convenience macros
 #define b3m_error(ki, err) { \
   snprintf(ki->error, 128, "ERROR: %s: %s\n", __func__, err); \
+  fprintf(stderr,"%s\n", ki->error); \
   return -1; }
 
 /*!
@@ -374,7 +375,7 @@ int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
 int b3m_set_angle_velocity(B3MData * r, UINT id, int *deg100, int velocity_deg100)
 {
 	int current_deg100;
-	if (!b3m_get_angle(r, id, &current_deg100)){
+	if (b3m_get_angle(r, id, &current_deg100)){
 		b3m_error(r, "get angle");
 	}
 	
