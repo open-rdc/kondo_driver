@@ -115,22 +115,23 @@ public:
     }
 
     void update (void) {
-		int pulse_cmd = 0;
-		if (cmd < min_angle*3.14/180) {
-			cmd = min_angle;
+		int deg100 = 0;				// degree * 100
+		double radian = cmd;
+		if (radian < min_angle * 3.14 / 180) {
+			radian = min_angle * 3.14 / 180;
 		}
-		if (cmd > max_angle*3.14/180) {
-			cmd = max_angle;
+		if (radian > max_angle * 3.14 / 180) {
+			radian = max_angle * 3.14 / 180;
 		}
 //		if (motor_power == true) {
-			pulse_cmd = radian_to_deg100(cmd);
+			deg100 = radian_to_deg100(radian);
 //		}
 		if (loopback) {
-			pos = cmd;
+			pos = radian;
 			eff = 0;
 		}else{
 			int pulse_ret = 0;
-			pulse_ret= b3m_set_angle(b3m, id, pulse_cmd);
+			pulse_ret= b3m_set_angle(b3m, id, deg100);
 			if (pulse_ret > 0) {
 				pos = deg100_to_radian (pulse_ret);
 			}

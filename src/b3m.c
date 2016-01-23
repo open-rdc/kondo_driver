@@ -306,7 +306,7 @@ int b3m_set_angle(B3MData * r, UINT id, int deg100)
 	printf("b3m_set_angle\n");
 	assert(r);
 
-	char data[2];
+	UCHAR data[2];
 	data[0] = deg100 & 0xff;
 	data[1] = deg100 >> 8;
 
