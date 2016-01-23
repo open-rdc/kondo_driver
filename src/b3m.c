@@ -327,7 +327,7 @@ int b3m_get_angle(B3MData * r, UINT id, int *deg100)
 	assert(r);
 
 	int err;
-	char data[2];
+	UCHAR data[2];
 	if (err = b3m_get_status(r, id, B3M_SERVO_CURRENT_POSITION, data, 2)){
 		b3m_error(r, "get status");
 	}
@@ -351,7 +351,7 @@ int b3m_get_velocity(B3MData * r, UINT id, int *deg100)
 	assert(r);
 
 	int err;
-	char data[2];
+	UCHAR data[2];
 	if (err = b3m_get_status(r, id, B3M_SERVO_CURRENT_VELOSITY, data, 2)){
 		b3m_error(r, "get status");
 	}
@@ -374,7 +374,7 @@ int b3m_servo_mode(B3MData * r, UINT id, UCHAR option)
 	printf("b3m_servo_mode\n");
 	assert(r);
 
-	char data[2];
+	UCHAR data[2];
 	data[0] = option;						// mode
 	data[1] = 0x00;							// interpolation
 
@@ -395,7 +395,7 @@ int b3m_get_current(B3MData * r, UINT id, int *current_mA)
 	assert(r);
 
 	int err;
-	char data[2];
+	UCHAR data[2];
 	if (err = b3m_get_status(r, id, B3M_SERVO_CURRENT, data, 2)){
 		b3m_error(r, "get status\n");
 	}
@@ -404,6 +404,31 @@ int b3m_get_current(B3MData * r, UINT id, int *current_mA)
 
 	return err;
 }
+
+
+/*!
+ * @brief get pwm duty ratio
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[out] duty_ratio duty ratio (unit?)
+ * @return error status.
+ */
+int b3m_get_pwm_duty_ratio(B3MData * r, UINT id, int *duty_ratio)
+{
+	printf("b3m_get_duty_ratio\n");
+	assert(r);
+
+	int err;
+	UCHAR data[2];
+	if (err = b3m_get_status(r, id, B3M_SERVO_PWM_DUTY, data, 2)){
+		b3m_error(r, "get status\n");
+	}
+
+	*duty_ratio = (int)((short)((data[1] << 8) + data[0]));
+
+	return err;
+}
+
 
 /*-----------------------------------------------------------------------------
  * Set stretch parameter of the servo
@@ -428,7 +453,7 @@ int b3m_set_speed(B3MData * r, UINT id, int deg100)
 	printf("b3m_set_speed\n");
 	assert(r);
 
-	char data[2];
+	UCHAR data[2];
 	data[0] = deg100 & 0xff;
 	data[1] = deg100 >> 8;
 
