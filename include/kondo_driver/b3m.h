@@ -202,6 +202,9 @@ int b3m_set_angle(B3MData * r, UINT id, int pos);
 int b3m_servo_mode(B3MData * r, UINT id, UCHAR option);
 
 // servo setting commands
+int b3m_get_angle(B3MData * r, UINT id, int *deg100);
+int b3m_get_velocity(B3MData * r, UINT id, int *deg100);
+
 int b3m_get_stretch(B3MData * r, UINT id);
 int b3m_get_current(B3MData * r, UINT id, int *current_mA);
 int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch);

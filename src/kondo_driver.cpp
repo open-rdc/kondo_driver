@@ -130,23 +130,21 @@ public:
 			pos = radian;
 			eff = 0;
 		}else{
-			int pulse_ret = 0;
-			pulse_ret= b3m_set_angle(b3m, id, deg100);
-			if (pulse_ret > 0) {
-				pos = deg100_to_radian (pulse_ret);
+			b3m_set_angle(b3m, id, deg100);
+			if (!b3m_get_angle(b3m, id, &deg100)){
+				pos = deg100_to_radian(deg100);
 			}
+
 			/* how can I get speed ? */
 			vel = 0;
+			if (!b3m_get_velocity(b3m, id, &deg100)){
+				vel = deg100_to_radian(deg100);
+			}
+
 			/* get servo current */
 			int current;
 			b3m_get_current(b3m, id, &current);
-			if (current > 0) {
-				if (current < 64) {
-					eff = current;
-				} else {
-					eff = - (current - 64);
-				}
-			}
+			eff = current;
 		}
     }
 

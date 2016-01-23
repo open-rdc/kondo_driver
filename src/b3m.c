@@ -315,20 +315,44 @@ int b3m_set_angle(B3MData * r, UINT id, int deg100)
 
 
 /*!
- * @brief get servo position
+ * @brief Get servo position
  *
  * @param[in] id the servo id, 0-255 (255: broadcast)
  * @param[out] deg100 the angle * 100
  * @return error status.
  */
-int b3m_get_angle(B3MData * r, UINT id, UINT pos, int *deg100)
+int b3m_get_angle(B3MData * r, UINT id, int *deg100)
 {
 	printf("b3m_get_angle\n");
 	assert(r);
 
 	int err;
 	char data[2];
-	if (err = b3m_get_status(r, id, B3M_SERVO_DESIRED_POSITION, data, 2)){
+	if (err = b3m_get_status(r, id, B3M_SERVO_CURRENT_POSITION, data, 2)){
+		b3m_error(r, "get status");
+	}
+
+	*deg100 = (int)((short)((data[1] << 8) + data[0]));
+
+	return err;
+}
+
+
+/*!
+ * @brief Get servo velocity
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[out] deg100 the angle/sec * 100
+ * @return error status.
+ */
+int b3m_get_velocity(B3MData * r, UINT id, int *deg100)
+{
+	printf("b3m_get_velocity\n");
+	assert(r);
+
+	int err;
+	char data[2];
+	if (err = b3m_get_status(r, id, B3M_SERVO_CURRENT_VELOSITY, data, 2)){
 		b3m_error(r, "get status");
 	}
 
