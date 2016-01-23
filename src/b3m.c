@@ -133,7 +133,7 @@ int b3m_read_timeout(B3MData * r, int n, long usecs)
 	}
 	// spam the read until data arrives
 	do {
-	    if ((i = read(r->fd, r->swap, n - bytes_read)) < 0) {
+	    if ((i = read(r->fd, &(r->swap[bytes_read]), n - bytes_read)) < 0) {
 			b3m_error(r, "Read data");
 	    }
 	    bytes_read += i;
@@ -179,6 +179,12 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout)
 	assert(r);
 	int i, j;
 
+	if ((i = b3m_purge(r)) < 0)
+		return i;
+
+	if ((i = b3m_write(r, bytes_out)) < 0)
+		return i;
+
 	// debug printing
 	if (r->debug) {
 		printf("send %d bytes: ", bytes_out);
@@ -186,12 +192,6 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout)
 			printf("%x ", r->swap[j]);
 		printf("\n");
 	}
-
-	if ((i = b3m_purge(r)) < 0)
-		return i;
-
-	if ((i = b3m_write(r, bytes_out)) < 0)
-		return i;
 
 	// clear swap
 	for (i = 0; i < bytes_in; i++)
