@@ -339,7 +339,7 @@ int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
 	r->swap[n++] = B3M_RETURN_ERROR_STATUS;	// option
 	r->swap[n++] = id;						// id
 	r->swap[n++] = *deg100 & 0xff;			// lower byte of the angle data
-	r->swap[n++] = *deg100 >> 8;				// higher byte of the angle data
+	r->swap[n++] = *deg100 >> 8;			// higher byte of the angle data
 	r->swap[n++] = period_ms & 0xff;		// lower byte of the angle data
 	r->swap[n++] = period_ms >> 8;			// higher byte of the angle data
 	for(i = 0; i < n; i ++){
@@ -351,12 +351,27 @@ int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
 	if ((i = b3m_trx_timeout(r, 9, 7, B3M_POS_TIMEOUT)) < 0)
 		return i;
 
+	prev_deg100 = *deg100;					// save previous desired angle for privending interference
 	*deg100 = (int)((short)((r->swap[5] << 8) + r->swap[4]));
 
 	// return error status
-	int err = r->swap[2];
-	if (err) prev_deg100 = *deg100;			// save previous desired angle for privending interference
-	return err;
+	return r->swap[2];
+}
+
+
+/*!
+ * @brief set control angle and velocity
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[in,out] deg100 angle (deg * 100)
+ * @param[in] current_deg100 current angle (deg * 100)
+ * @param[in] velocity_deg100 angular velocity (deg/sec * 100)
+ * @return error status.
+ */
+int b3m_set_angle_velocity(B3MData * r, UINT id, int *deg100, int current_deg100, int velocity_deg100)
+{
+	int period_ms = (*deg100 - current_deg100) * 1000 / velocity_deg100;
+	return b3m_set_angle_period(r, id, deg100, period_ms);
 }
 
 
