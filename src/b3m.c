@@ -26,6 +26,8 @@
 
 #include "kondo_driver/b3m.h"
 
+int target_deg100[256];
+
 // Convenience macros
 #define b3m_error(ki, err) { \
   snprintf(ki->error, 128, "ERROR: %s: %s\n", __func__, err); \
@@ -39,6 +41,7 @@
  */
 int b3m_init(B3MData * r, const char* serial_port)
 {
+	int i;
 	printf("b3m_init\n");
 	assert(r);
 	r->debug = 1;
@@ -54,6 +57,8 @@ int b3m_init(B3MData * r, const char* serial_port)
 	if (ioctl(r->fd, TCSETS, &tio)){
 		b3m_error(r, "Set serial port parameters");
 	}
+
+	for(i = 0; i < 256; i ++) target_deg100[i] = 100000;
 
 	return 0;
 }
@@ -324,8 +329,7 @@ int b3m_set_angle(B3MData * r, UINT id, int deg100)
  */
 int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
 {
-	static int prev_deg100 = 100000;
-	if (*deg100 == prev_deg100) return 0;
+	if (*deg100 == target_deg100[id]) return 0;
 
 	printf("b3m_set_angle_period\n");
 	assert(r);
@@ -351,7 +355,7 @@ int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
 	if ((i = b3m_trx_timeout(r, 9, 7, B3M_POS_TIMEOUT)) < 0)
 		return i;
 
-	prev_deg100 = *deg100;					// save previous desired angle for privending interference
+	target_deg100[id] = *deg100;					// save previous desired angle for privending interference
 	*deg100 = (int)((short)((r->swap[5] << 8) + r->swap[4]));
 
 	// return error status
@@ -364,13 +368,17 @@ int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
  *
  * @param[in] id the servo id, 0-255 (255: broadcast)
  * @param[in,out] deg100 angle (deg * 100)
- * @param[in] current_deg100 current angle (deg * 100)
  * @param[in] velocity_deg100 angular velocity (deg/sec * 100)
  * @return error status.
  */
-int b3m_set_angle_velocity(B3MData * r, UINT id, int *deg100, int current_deg100, int velocity_deg100)
+int b3m_set_angle_velocity(B3MData * r, UINT id, int *deg100, int velocity_deg100)
 {
-	int period_ms = fabs(*deg100 - current_deg100) * 1000 / velocity_deg100;
+	int current_deg100;
+	if (!b3m_get_angle(r, id, &current_deg100)){
+		b3m_error(r, "get angle");
+	}
+	
+	int period_ms = abs(*deg100 - current_deg100) * 1000 / velocity_deg100;
 	return b3m_set_angle_period(r, id, deg100, period_ms);
 }
 

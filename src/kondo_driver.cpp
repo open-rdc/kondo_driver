@@ -118,9 +118,7 @@ public:
     }
 
     void update (void) {
-		const int DESIRED_VELOCITY = 3000;	// for safty
-		static int current_deg100 = DESIRED_VELOCITY * 10 - cmd;
-
+		static const int DESIRED_VELOCITY = 3000;	// for safty
 		int deg100 = 0;				// degree * 100
 		double radian = cmd;
 		if (radian < min_angle * 3.14 / 180) {
@@ -136,8 +134,7 @@ public:
 			pos = radian;
 			eff = 0;
 		}else{
-			if (!b3m_set_angle_velocity(b3m, id, &deg100, current_deg100, DESIRED_VELOCITY)){
-				current_deg100 = deg100;
+			if (!b3m_set_angle_velocity(b3m, id, &deg100, DESIRED_VELOCITY)){
 				pos = deg100_to_radian(deg100);
 			}
 
