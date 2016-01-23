@@ -118,9 +118,8 @@ public:
     }
 
     void update (void) {
-		const int PERIOD = 3000;	// for safty (TEMP)
-		const int DESIRED_VELOCITY = 3000;	// for safty (TEMP)
-		static int current_deg100 = 0;
+		const int DESIRED_VELOCITY = 3000;	// for safty
+		static int current_deg100 = DESIRED_VELOCITY * 10 - cmd;
 
 		int deg100 = 0;				// degree * 100
 		double radian = cmd;
@@ -130,9 +129,9 @@ public:
 		if (radian > max_angle * 3.14 / 180) {
 			radian = max_angle * 3.14 / 180;
 		}
-//		if (motor_power == true) {
+		if (motor_power == true) {
 			deg100 = radian_to_deg100(radian);
-//		}
+		}
 		if (loopback) {
 			pos = radian;
 			eff = 0;
@@ -141,16 +140,8 @@ public:
 				current_deg100 = deg100;
 				pos = deg100_to_radian(deg100);
 			}
-//			if (!b3m_set_angle_period(b3m, id, &deg100, PERIOD)){
-//				pos = deg100_to_radian(deg100);
-//			}
-/*
-			b3m_set_angle(b3m, id, deg100);
-			if (!b3m_get_angle(b3m, id, &deg100)){
-				pos = deg100_to_radian(deg100);
-			}
-*/
-			/* how can I get speed ? */
+
+			/* get speed */
 			vel = 0;
 			if (!b3m_get_velocity(b3m, id, &deg100)){
 				vel = deg100_to_radian(deg100);
