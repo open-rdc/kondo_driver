@@ -370,7 +370,7 @@ int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
  */
 int b3m_set_angle_velocity(B3MData * r, UINT id, int *deg100, int current_deg100, int velocity_deg100)
 {
-	int period_ms = (*deg100 - current_deg100) * 1000 / velocity_deg100;
+	int period_ms = fabs(*deg100 - current_deg100) * 1000 / velocity_deg100;
 	return b3m_set_angle_period(r, id, deg100, period_ms);
 }
 
