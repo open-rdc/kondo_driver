@@ -151,6 +151,11 @@
 #define B3M_OPTIONS_SERVO_CLONE			0x40
 #define B3M_OPTIONS_SERVO_REVERSE		0x80
 
+#define B3M_OPTIONS_TRAJECTORY_NORMAL	0x00
+#define B3M_OPTIONS_TRAJECTORY_1		0x01
+#define B3M_OPTIONS_TRAJECTORY_3		0x03
+#define B3M_OPTIONS_TRAJECTORY_4		0x04
+#define B3M_OPTIONS_TRAJECTORY_5		0x05
 
 
 #define B3M_CMD_ID	0
@@ -199,6 +204,8 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout);
 
 // position commands
 int b3m_set_angle(B3MData * r, UINT id, int pos);
+int b3m_set_trajectory_mode(B3MData * r, UINT id, int trajectory_mode);
+int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms);
 int b3m_servo_mode(B3MData * r, UINT id, UCHAR option);
 
 // servo setting commands

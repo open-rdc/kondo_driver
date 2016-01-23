@@ -79,8 +79,11 @@ public:
 		if (!loopback) {
 			// Check motor existence
 			if (b3m_servo_mode(b3m, id, B3M_OPTIONS_RUN_NORMAL) <= 0) {
-			ROS_WARN("Cannot connect to servo ID: %d", id);
+				ROS_WARN("Cannot connect to servo ID: %d", id);
 			}
+		}
+		if (b3m_set_trajectory_mode(b3m, id, B3M_OPTIONS_TRAJECTORY_4) <= 0) {
+			ROS_WARN("Cannot set trajectory mode to servo ID: %d", id);
 		}
 		if (nh.getParam("joint_name", joint_name)) {
 			ROS_INFO("joint_name: %s", joint_name.c_str());
@@ -130,11 +133,15 @@ public:
 			pos = radian;
 			eff = 0;
 		}else{
+			if (!b3m_set_angle_period(b3m, id, &deg100, 1000)){
+				pos = deg100_to_radian(deg100);
+			}
+/*
 			b3m_set_angle(b3m, id, deg100);
 			if (!b3m_get_angle(b3m, id, &deg100)){
 				pos = deg100_to_radian(deg100);
 			}
-
+*/
 			/* how can I get speed ? */
 			vel = 0;
 			if (!b3m_get_velocity(b3m, id, &deg100)){

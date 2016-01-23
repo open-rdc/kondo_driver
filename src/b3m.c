@@ -315,6 +315,66 @@ int b3m_set_angle(B3MData * r, UINT id, int deg100)
 
 
 /*!
+ * @brief set control angle and period
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[in,out] deg100 angle (deg * 100)
+ * @param[in] period_ms period (ms)
+ * @return error status.
+ */
+int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
+{
+	printf("b3m_set_angle_period\n");
+	assert(r);
+
+	int i, n = 0;
+	int sum = 0, time = 0;
+
+	// build command
+	r->swap[n++] = 0x09;					// length
+	r->swap[n++] = B3M_CMD_POSITION;		// command
+	r->swap[n++] = B3M_RETURN_ERROR_STATUS;	// option
+	r->swap[n++] = id;						// id
+	r->swap[n++] = *deg100 & 0xff;			// lower byte of the angle data
+	r->swap[n++] = *deg100 >> 8;				// higher byte of the angle data
+	r->swap[n++] = period_ms & 0xff;		// lower byte of the angle data
+	r->swap[n++] = period_ms >> 8;			// higher byte of the angle data
+	for(i = 0; i < n; i ++){
+		sum += r->swap[i];
+	}
+	r->swap[n] = sum & 0xff;
+
+	// synchronize with servo
+	if ((i = b3m_trx_timeout(r, 9, 7, B3M_POS_TIMEOUT)) < 0)
+		return i;
+
+	*deg100 = (int)((short)((r->swap[5] << 8) + r->swap[4]));
+
+	// return error status
+	return r->swap[2];
+}
+
+
+/*!
+ * @brief set trajectory mode
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[in] trajectory_mode trajectory mode
+ * @return error status.
+ */
+int b3m_set_trajectory_mode(B3MData * r, UINT id, int trajectory_mode)
+{
+	printf("b3m_set_trajectory_mode\n");
+	assert(r);
+
+	UCHAR data[1];
+	data[0] = trajectory_mode;
+
+	return b3m_com_send(r, id, B3M_SERVO_RUN_MODE, data, 1);
+}
+
+
+/*!
  * @brief Get servo position
  *
  * @param[in] id the servo id, 0-255 (255: broadcast)
@@ -326,15 +386,13 @@ int b3m_get_angle(B3MData * r, UINT id, int *deg100)
 	printf("b3m_get_angle\n");
 	assert(r);
 
-	int err;
 	UCHAR data[2];
-	if (err = b3m_get_status(r, id, B3M_SERVO_CURRENT_POSITION, data, 2)){
+	if (b3m_get_status(r, id, B3M_SERVO_CURRENT_POSITION, data, 2)){
 		b3m_error(r, "get status");
 	}
 
 	*deg100 = (int)((short)((data[1] << 8) + data[0]));
-
-	return err;
+	return 0;
 }
 
 
