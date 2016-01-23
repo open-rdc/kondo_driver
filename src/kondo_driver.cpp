@@ -137,7 +137,8 @@ public:
 			/* how can I get speed ? */
 			vel = 0;
 			/* get servo current */
-			int current = b3m_get_current(b3m, id);
+			int current;
+			b3m_get_current(b3m, id, &current);
 			if (current > 0) {
 				if (current < 64) {
 					eff = current;
@@ -215,8 +216,8 @@ class KondoDriver : public hardware_interface::RobotHW
 		if (!loopback) {
 			// Initiallize B3M interface
 			if (b3m_init(&b3m, serial_port.c_str()) < 0) {
-			ROS_ERROR ("Could not init B3M: %s\n", b3m.error);
-			exit(0);
+				ROS_ERROR ("Could not init B3M: %s\n", b3m.error);
+				exit(0);
 			}
 		}
 		// Load atuators

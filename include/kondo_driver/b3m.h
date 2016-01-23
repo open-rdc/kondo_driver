@@ -203,7 +203,7 @@ int b3m_servo_mode(B3MData * r, UINT id, UCHAR option);
 
 // servo setting commands
 int b3m_get_stretch(B3MData * r, UINT id);
-int b3m_get_current(B3MData * r, UINT id);
+int b3m_get_current(B3MData * r, UINT id, int *current_mA);
 int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch);
 int b3m_set_speed(B3MData * r, UINT id, UCHAR speed);
 int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim);
@@ -212,11 +212,5 @@ int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim);
 // set servo id (for use when 1 servo is connected)
 int b3m_get_id(B3MData * r);
 int b3m_set_id(B3MData * r, UINT id);
-
-// low level commands (be careful!)
-//int b3m_get_eeprom(B3MData * r, UCHAR ** dest);
-//int b3m_set_eeprom(B3MData * r, UCHAR ** eeprom);
-//int b3m_get_mem_bytes(B3MData * r, UCHAR addr, UCHAR num_bytes, UCHAR ** dst);
-//int b3m_set_mem_bytes(B3MData * r, UCHAR addr, UCHAR num_bytes, UCHAR ** src);
 
 #endif /* B3M_H_ */

@@ -26,18 +26,16 @@
 
 #include "kondo_driver/b3m.h"
 
-/*-----------------------------------------------------------------------------
- * Convenience macros
- */
+// Convenience macros
 #define b3m_error(ki, err) { \
   snprintf(ki->error, 128, "ERROR: %s: %s\n", __func__, err); \
   return -1; }
 
-/*-----------------------------------------------------------------------------
- * Iniitialize the B3M interface
- * Here we mainly setup the FTDI USB-to-serial communication
- * 115200 baud, 8 bits, even parity, 1 stop bit.
- * Returns: 0 if successful, < 0 otherwise
+/*!
+ * @brief Iniitialize the B3M interface
+ * 115200 baud, 8 bits, even parity, 1 stop bit
+ *
+ * @return 0 if successful, < 0 otherwise
  */
 int b3m_init(B3MData * r, const char* serial_port)
 {
@@ -49,20 +47,21 @@ int b3m_init(B3MData * r, const char* serial_port)
 
 	r->fd = open(serial_port, O_RDWR);
 	if (ioctl(r->fd, TCGETS, &tio)){
-		fprintf(stderr, "Error: Get serial port parameters\n");
+		b3m_error(r, "Get serial port parameters");
 	}
 	tio.c_cflag &= ~CBAUD;
 	tio.c_cflag |= B3M_BAUD;
 	if (ioctl(r->fd, TCSETS, &tio)){
-		fprintf(stderr, "Error: Set serial port parameters\n");
+		b3m_error(r, "Set serial port parameters");
 	}
+
 	return 0;
 }
 
-/*-----------------------------------------------------------------------------
- * Close / Deinitialize the B3M Interface.
- * Mainly closes the USB device and deletes the allocated data.
- * Returns 0 if successful, < 0 otherwise
+/*!
+ * @brief Close / Deinitialize the B3M Interface
+ * 
+ * @return 0 if successful, < 0 otherwise
  */
 int b3m_close(B3MData * r)
 {
@@ -74,50 +73,57 @@ int b3m_close(B3MData * r)
 	return 0;
 }
 
-/*-----------------------------------------------------------------------------
- * Write n bytes from the swap to the Kondo.
- * Returns >0 number of bytes written, < 0 if error
+/*!
+ * @brief Write n bytes from the swap to the Kondo
+ * 
+ * @return >0 number of bytes written, < 0 if error
  */
 int b3m_write(B3MData * r, int n)
 {
 	printf("b3m_write\n");
 	assert(r);
+
 	int i;
 	if ((i = write(r->fd, r->swap, n)) < 0)
-		fprintf(stderr, "Error: Send data\n");
+		b3m_error(r, "Send data");
+
 	return i;
 }
 
-/*-----------------------------------------------------------------------------
- * Read n bytes from B3M. Reads immediately from the serial buffer.
+/*!
+ * @brief Read n bytes from B3M. Reads immediately from the serial buffer
  * See b3m_read_timeout for a version that blocks waiting for the data.
- * Returns < 0: error
- * Returns >= 0: number of bytes read
+ *
+ * @return < 0: error, >= 0: number of bytes read
  */
 int b3m_read(B3MData * r, int n)
 {
 	printf("b3m_read\n");
 	assert(r);
+	
 	int i;
 	if ((i = read(r->fd, r->swap, n)) < 0)
-		fprintf(stderr, "Error: Read data\n");
+		b3m_error(r, "Read data");
+	
 	return i;
 }
 
-/*-----------------------------------------------------------------------------
- * Read n bytes from the B3M, waiting for at most usecs for the n bytes.
+/*!
+ * @brief Read n bytes from the B3M, waiting for at most usecs for the n bytes
  * Performs this by continuously polling the serial buffer until either
  * all of the bytes are read or the timeout has been reached.
- * Returns < 0: error
- * Returns >= 0: number of bytes read
+ *
+ * @return < 0: error, >= 0: number of bytes read
  */
 int b3m_read_timeout(B3MData * r, int n, long usecs)
 {
 	printf("b3m_read_timeout\n");
 	assert(r);
+
 	static struct timeval tv, end;
 	int i = 0, bytes_read = 0;
 	gettimeofday(&tv, NULL);
+	
 	// determine end time
 	end.tv_sec = tv.tv_sec + usecs / 1000000;
 	end.tv_usec = tv.tv_usec + usecs % 1000000;
@@ -128,7 +134,7 @@ int b3m_read_timeout(B3MData * r, int n, long usecs)
 	// spam the read until data arrives
 	do {
 	    if ((i = read(r->fd, r->swap, n - bytes_read)) < 0) {
-		fprintf(stderr, "Error: Read data\n");
+			b3m_error(r, "Read data");
 	    }
 	    bytes_read += i;
 	    gettimeofday(&tv, NULL);
@@ -136,40 +142,42 @@ int b3m_read_timeout(B3MData * r, int n, long usecs)
 	return bytes_read;
 }
 
-/*-----------------------------------------------------------------------------
- * Purge the serial buffers.
- * Returns 0 if successful, < 0 if error
+/*!
+ * @brief Purge the serial buffers
+ *
+ * @return 0 if successful, < 0 if error
  */
 int b3m_purge(B3MData * r)
 {
 	printf("b3m_purge\n");
 	assert(r);
 	tcflush(r->fd, TCIOFLUSH);
+
 	return 0;
 }
 
-/*-----------------------------------------------------------------------------
+/*!
+ * @brief Transaction template: Purge, then send out_bytes, then receive in_bytes
  * Transaction template: Purge, then send out_bytes, then receive in_bytes
  * Blocks for B3M_RX_TIMEOUT microseconds (default value)
- * Returns < 0: error
- * Returns >= 0: number of bytes read
+ *
+ * @return < 0: error, >= 0: number of bytes read
  */
 int b3m_trx(B3MData * r, UINT bytes_out, UINT bytes_in)
 {
 	return b3m_trx_timeout(r, bytes_out, bytes_in, B3M_RX_TIMEOUT);
 }
 
-/*-----------------------------------------------------------------------------
- * Transaction template: Purge, then send out_bytes, then receive in_bytes
+/*!
+ * @brief Transaction template: Purge, then send out_bytes, then receive in_bytes
  * On RX, blocks for at most timeout microseconds before giving up.
- * Returns < 0: error
- * Returns >= 0: number of bytes read
+ *
+ * @return < 0: error, >= 0: number of bytes read
  */
 int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout)
 {
 	assert(r);
-	int i;
-	int j;
+	int i, j;
 
 	// debug printing
 	if (r->debug) {
@@ -181,6 +189,7 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout)
 
 	if ((i = b3m_purge(r)) < 0)
 		return i;
+
 	if ((i = b3m_write(r, bytes_out)) < 0)
 		return i;
 
@@ -272,8 +281,9 @@ int b3m_get_status(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
 	r->swap[n] = sum & 0xff;
 
 	// synchronize with servo
-	if ((i = b3m_trx_timeout(r, 7, 5 + byte, B3M_POS_TIMEOUT)) < 0)
+	if ((i = b3m_trx_timeout(r, 7, 5 + byte, B3M_POS_TIMEOUT)) < 0){
 		return i;
+	}
 
 	for(i = 0; i < byte; i ++){
 		data[i] = r->swap[i + 4];
@@ -305,23 +315,26 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
 
 
 /*!
- * @brief set servo position
+ * @brief get servo position
  *
  * @param[in] id the servo id, 0-255 (255: broadcast)
- * @param[in] pos the position to set (angle * 100)
+ * @param[out] deg100 the angle * 100
  * @return error status.
  */
-int b3m_get_pos(B3MData * r, UINT id, UINT pos)
+int b3m_get_pos(B3MData * r, UINT id, UINT pos, int *deg100)
 {
 	printf("b3m_get_pos\n");
 	assert(r);
 
+	int err;
 	char data[2];
-	if (b3m_get_status(r, id, B3M_SERVO_DESIRED_POSITION, data, 2)){
-		fprintf(stderr, "Error: get status\n");
+	if (err = b3m_get_status(r, id, B3M_SERVO_DESIRED_POSITION, data, 2)){
+		b3m_error(r, "get status");
 	}
 
-	return (int)((short)((data[1] << 8) + data[0]));
+	*deg100 = (int)((short)((data[1] << 8) + data[0]));
+
+	return err;
 }
 
 
@@ -344,34 +357,28 @@ int b3m_servo_mode(B3MData * r, UINT id, UCHAR option)
 	return b3m_com_send(r, id, B3M_SERVO_SERVO_MODE, data, 2);
 }
 
-/*-----------------------------------------------------------------------------
- * Get servo current
- * id: the servo id, 0-31
- * Returns: Value of current (>= 0) if successful, < 0 if error
+
+/*!
+ * @brief get servo current
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[out] current_mA
+ * @return error status.
  */
-int b3m_get_current(B3MData * r, UINT id)
+int b3m_get_current(B3MData * r, UINT id, int *current_mA)
 {
-/*
 	printf("b3m_get_current\n");
 	assert(r);
-	int i;
 
-	// check valid id
-	if (id > 31)
-		b3m_error(r, "Invalid servo ID > 31.");
+	int err;
+	char data[2];
+	if (err = b3m_get_status(r, id, B3M_SERVO_CURRENT, data, 2)){
+		b3m_error(r, "get status\n");
+	}
 
-	// build command
-	r->swap[0] = id | B3M_CMD_GET; // id and command
-	r->swap[1] = B3M_SC_CURRENT; // subcommand
+	*current_mA = (int)((short)((data[1] << 8) + data[0]));
 
-	// synchronize
-	if ((i = b3m_trx_timeout(r, 2, 5, B3M_GET_TIMEOUT)) < 0)
-		return i;
-
-	// return stretch
-	return r->swap[4];
-*/
-	return 0;
+	return err;
 }
 
 /*-----------------------------------------------------------------------------
