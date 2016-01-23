@@ -34,7 +34,7 @@ int radian_to_pulse (double radian)
     return CNT_PULSE + radian/RADIAN_PER_PULSE;
 }
 
-dobule deg100_to_radian (double deg100)
+double deg100_to_radian (double deg100)
 {
     return deg100/RAD_TO_DEG;
 }
