@@ -118,7 +118,7 @@ public:
     }
 
     void update (void) {
-		static const int DESIRED_VELOCITY = 3000;	// for safty
+		static const int DESIRED_VELOCITY = 2000;	// for safty
 		int deg100 = 0;				// degree * 100
 		double radian = cmd;
 		if (radian < min_angle * 3.14 / 180) {
