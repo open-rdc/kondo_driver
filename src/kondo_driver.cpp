@@ -143,7 +143,7 @@ public:
 
 			/* get servo current */
 			int pwm_duty_ratio;
-			b3m_get_current(b3m, id, &pwm_duty_ratio);
+			b3m_get_pwm_duty_ratio(b3m, id, &pwm_duty_ratio);
 			eff = pwm_duty_ratio;
 		}
     }
