@@ -274,7 +274,7 @@ int b3m_get_status(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
 	r->swap[n++] = B3M_RETURN_ERROR_STATUS;	// option
 	r->swap[n++] = id;						// id
 	r->swap[n++] = address;
-	r->swap[n++] = 0x01;					// number of ID
+	r->swap[n++] = byte;					// number of ID
 	for(i = 0; i < n; i ++){
 		sum += r->swap[i];
 	}
