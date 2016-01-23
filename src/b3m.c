@@ -301,14 +301,14 @@ int b3m_get_status(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
  * @param[in] pos the position to set (angle * 100)
  * @return error status.
  */
-int b3m_pos(B3MData * r, UINT id, UINT pos)
+int b3m_set_angle(B3MData * r, UINT id, int deg100)
 {
-	printf("b3m_pos\n");
+	printf("b3m_set_angle\n");
 	assert(r);
 
 	char data[2];
-	data[0] = pos & 0xff;
-	data[1] = pos >> 8;
+	data[0] = deg100 & 0xff;
+	data[1] = deg100 >> 8;
 
 	return b3m_com_send(r, id, B3M_SERVO_DESIRED_POSITION, data, 2);
 }
@@ -321,9 +321,9 @@ int b3m_pos(B3MData * r, UINT id, UINT pos)
  * @param[out] deg100 the angle * 100
  * @return error status.
  */
-int b3m_get_pos(B3MData * r, UINT id, UINT pos, int *deg100)
+int b3m_get_angle(B3MData * r, UINT id, UINT pos, int *deg100)
 {
-	printf("b3m_get_pos\n");
+	printf("b3m_get_angle\n");
 	assert(r);
 
 	int err;
@@ -389,63 +389,28 @@ int b3m_get_current(B3MData * r, UINT id, int *current_mA)
  */
 int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch)
 {
-/*
-	printf("b3m_set_stretch\n");
-	assert(r);
-	int i;
-
-	// check valid stuff
-	if (id > 31)
-		b3m_error(r, "Invalid servo ID > 31.");
-	if (stretch < 1 || stretch > 127)
-		b3m_error(r, "Invalid stretch, not [1-127]");
-
-	// build command
-	r->swap[0] = id | B3M_CMD_SET; // id and command
-	r->swap[1] = B3M_SC_STRETCH; // subcommand
-	r->swap[2] = stretch;
-
-	// synchronize
-	if ((i = b3m_trx_timeout(r, 3, 6, B3M_SET_TIMEOUT)) < 0)
-		return i;
-
-	return r->swap[5];
-*/
 	return 0;
 }
 
-/*-----------------------------------------------------------------------------
- * Set speed parameter of the servo
- * id: the id of the servo 0-31
- * stretch: the desired speed 1(2)-127(254)
- * Returns: the speed as reported by the servo (>= 0), or < 0 if error
+/*!
+ * @brief Set speed parameter of the servo
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[out] current_mA
+ * @return error status.
  */
-int b3m_set_speed(B3MData * r, UINT id, UCHAR speed)
+int b3m_set_speed(B3MData * r, UINT id, int deg100)
 {
-/*
 	printf("b3m_set_speed\n");
 	assert(r);
-	int i;
 
-	// check valid stuff
-	if (id > 31)
-		b3m_error(r, "Invalid servo ID > 31.");
-	if (speed < 1 || speed > 127)
-		b3m_error(r, "Invalid speed, not [1-127]");
+	char data[2];
+	data[0] = deg100 & 0xff;
+	data[1] = deg100 >> 8;
 
-	// build command
-	r->swap[0] = id | B3M_CMD_SET; // id and command
-	r->swap[1] = B3M_SC_SPEED; // subcommand
-	r->swap[2] = speed;
-
-	// synchronize
-	if ((i = b3m_trx_timeout(r, 3, 6, B3M_SET_TIMEOUT)) < 0)
-		return i;
-
-	return r->swap[5];
-*/
-	return 0;
+	return b3m_com_send(r, id, B3M_SERVO_DESIRED_VELOSITY, data, 2);
 }
+
 /*-----------------------------------------------------------------------------
  * Set current limit parameter of the servo
  * id: the id of the servo 0-31

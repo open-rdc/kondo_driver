@@ -198,14 +198,14 @@ int b3m_trx(B3MData * r, UINT bytes_out, UINT bytes_in);
 int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout);
 
 // position commands
-int b3m_pos(B3MData * r, UINT id, UINT pos);
+int b3m_set_angle(B3MData * r, UINT id, int pos);
 int b3m_servo_mode(B3MData * r, UINT id, UCHAR option);
 
 // servo setting commands
 int b3m_get_stretch(B3MData * r, UINT id);
 int b3m_get_current(B3MData * r, UINT id, int *current_mA);
 int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch);
-int b3m_set_speed(B3MData * r, UINT id, UCHAR speed);
+int b3m_set_speed(B3MData * r, UINT id, int speed);
 int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim);
 int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim);
 

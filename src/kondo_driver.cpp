@@ -130,7 +130,7 @@ public:
 			eff = 0;
 		}else{
 			int pulse_ret = 0;
-			pulse_ret= b3m_pos(b3m, id, pulse_cmd);
+			pulse_ret= b3m_set_angle(b3m, id, pulse_cmd);
 			if (pulse_ret > 0) {
 				pos = deg100_to_radian (pulse_ret);
 			}
