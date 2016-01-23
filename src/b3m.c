@@ -324,6 +324,9 @@ int b3m_set_angle(B3MData * r, UINT id, int deg100)
  */
 int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
 {
+	static int prev_deg100 = 100000;
+	if (*deg100 == prev_deg100) return 0;
+
 	printf("b3m_set_angle_period\n");
 	assert(r);
 
@@ -351,7 +354,9 @@ int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
 	*deg100 = (int)((short)((r->swap[5] << 8) + r->swap[4]));
 
 	// return error status
-	return r->swap[2];
+	int err = r->swap[2];
+	if (err) prev_deg100 = *deg100;			// save previous desired angle for privending interference
+	return err;
 }
 
 

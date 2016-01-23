@@ -118,6 +118,8 @@ public:
     }
 
     void update (void) {
+		const int PERIOD = 3000;	// for safty (TEMP)
+
 		int deg100 = 0;				// degree * 100
 		double radian = cmd;
 		if (radian < min_angle * 3.14 / 180) {
@@ -133,7 +135,7 @@ public:
 			pos = radian;
 			eff = 0;
 		}else{
-			if (!b3m_set_angle_period(b3m, id, &deg100, 1000)){
+			if (!b3m_set_angle_period(b3m, id, &deg100, PERIOD)){
 				pos = deg100_to_radian(deg100);
 			}
 /*
