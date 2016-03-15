@@ -547,67 +547,43 @@ int b3m_set_speed(B3MData * r, UINT id, int deg100)
 	return b3m_com_send(r, id, B3M_SERVO_DESIRED_VELOSITY, data, 2);
 }
 
-/*-----------------------------------------------------------------------------
- * Set current limit parameter of the servo
- * id: the id of the servo 0-31
- * curlim: the desired current limit 1-63
- * Returns: the current limit as reported by the servo (>= 0), or < 0 if error
+
+/*!
+ * @brief Set current limit parameter of the servo
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[out] current_mA limit of current (mA)
+ * @return error status.
  */
-int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim)
+int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim_mA)
 {
 	printf("b3m_set_current_limit\n");
 	assert(r);
-	int i;
 
-	// check valid stuff
-	if (id > 31)
-		b3m_error(r, "Invalid servo ID > 31.");
-	if (curlim < 1 || curlim > 63)
-		b3m_error(r, "Invalid current, not [1-63]");
+	UCHAR data[2];
+	data[0] = curlim_mA & 0xff;
+	data[1] = curlim_mA >> 8;
 
-	// build command
-	r->swap[0] = id | B3M_CMD_SET; // id and command
-	r->swap[1] = B3M_SC_CURRENT; // subcommand
-	r->swap[2] = curlim;
-
-	// synchronize
-	if ((i = b3m_trx_timeout(r, 3, 6, B3M_SET_TIMEOUT)) < 0)
-		return i;
-
-	return r->swap[5];
+	return b3m_com_send(r, id, B3M_SYSTEM_CURRENT_LIMIT, data, 2);	
 }
 
-/*-----------------------------------------------------------------------------
- * Set temperature limit parameter of the servo
- * id: the id of the servo 0-31
- * templim: the desired current limit 1-127
- * Returns: the temperature limit as reported by the servo (>= 0), or < 0 if error
+/*!
+ * @brief Set temperature limit parameter of the servo
+ *
+ * @param[in] id the servo id, 0-255 (255: broadcast)
+ * @param[out] templim limit of temparature (deg * 100)
+ * @return error status.
  */
 int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim)
 {
-/*
 	printf("b3m_set_temperature_limit\n");
 	assert(r);
-	int i;
 
-	// check valid stuff
-	if (id > 31)
-		b3m_error(r, "Invalid servo ID > 31.");
-	if (templim < 1 || templim > 127)
-		b3m_error(r, "Invalid temperature, not [1-127]");
+	UCHAR data[2];
+	data[0] = templim & 0xff;
+	data[1] = templim >> 8;
 
-	// build command
-	r->swap[0] = id | B3M_CMD_SET; // id and command
-	r->swap[1] = B3M_SC_TEMPERATURE; // subcommand
-	r->swap[2] = templim;
-
-	// synchronize
-	if ((i = b3m_trx_timeout(r, 3, 6, B3M_SET_TIMEOUT)) < 0)
-		return i;
-
-	return r->swap[5];
-*/
-	return 0;
+	return b3m_com_send(r, id, B3M_SYSTEM_MOTOR_TEMP_LIMIT, data, 2);	
 }
 
 /*-----------------------------------------------------------------------------
