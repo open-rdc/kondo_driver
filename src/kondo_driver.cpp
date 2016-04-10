@@ -104,11 +104,11 @@ public:
 		}
 		if (nh.getParam("current_limit", curr_limit)) {
 			ROS_INFO("current_limit: %d", curr_limit);
-			set_current_limit(curr_limit);
+//			set_current_limit(curr_limit);
 		}
 		if (nh.getParam("temperature_limit", temp_limit)) {
 			ROS_INFO("temperature_limit: %d", temp_limit);
-			set_temperature_limit(temp_limit);
+//			set_temperature_limit(temp_limit);
 		}
 		hardware_interface::JointStateHandle state_handle(joint_name, &pos, &vel, &eff);
 		state_interface.registerHandle(state_handle);
