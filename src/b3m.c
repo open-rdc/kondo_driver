@@ -45,7 +45,7 @@ int b3m_init(B3MData * r, const char* serial_port)
 	int i;
 	printf("b3m_init\n");
 	assert(r);
-	r->debug = 1;
+	r->debug = 0;
 
 	struct termios tio;
 
@@ -86,7 +86,7 @@ int b3m_close(B3MData * r)
  */
 int b3m_write(B3MData * r, int n)
 {
-	printf("b3m_write\n");
+//	printf("b3m_write\n");
 	assert(r);
 
 	int i;
@@ -104,7 +104,7 @@ int b3m_write(B3MData * r, int n)
  */
 int b3m_read(B3MData * r, int n)
 {
-	printf("b3m_read\n");
+//	printf("b3m_read\n");
 	assert(r);
 	
 	int i;
@@ -123,7 +123,7 @@ int b3m_read(B3MData * r, int n)
  */
 int b3m_read_timeout(B3MData * r, int n, long usecs)
 {
-	printf("b3m_read_timeout\n");
+//	printf("b3m_read_timeout\n");
 	assert(r);
 
 	static struct timeval tv, end;
@@ -155,7 +155,7 @@ int b3m_read_timeout(B3MData * r, int n, long usecs)
  */
 int b3m_purge(B3MData * r)
 {
-	printf("b3m_purge\n");
+//	printf("b3m_purge\n");
 	assert(r);
 	tcflush(r->fd, TCIOFLUSH);
 
@@ -309,7 +309,7 @@ int b3m_get_status(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
  */
 int b3m_set_angle(B3MData * r, UINT id, int deg100)
 {
-	printf("b3m_set_angle\n");
+//	printf("b3m_set_angle\n");
 	assert(r);
 
 	UCHAR data[2];
@@ -393,7 +393,7 @@ int b3m_set_angle_velocity(B3MData * r, UINT id, int *deg100, int velocity_deg10
  */
 int b3m_set_trajectory_mode(B3MData * r, UINT id, int trajectory_mode)
 {
-	printf("b3m_set_trajectory_mode\n");
+//	printf("b3m_set_trajectory_mode\n");
 	assert(r);
 
 	UCHAR data[1];
@@ -412,7 +412,7 @@ int b3m_set_trajectory_mode(B3MData * r, UINT id, int trajectory_mode)
  */
 int b3m_get_angle(B3MData * r, UINT id, int *deg100)
 {
-	printf("b3m_get_angle\n");
+//	printf("b3m_get_angle\n");
 	assert(r);
 
 	UCHAR data[2];
@@ -434,7 +434,7 @@ int b3m_get_angle(B3MData * r, UINT id, int *deg100)
  */
 int b3m_get_velocity(B3MData * r, UINT id, int *deg100)
 {
-	printf("b3m_get_velocity\n");
+//	printf("b3m_get_velocity\n");
 	assert(r);
 
 	int err;
@@ -458,7 +458,7 @@ int b3m_get_velocity(B3MData * r, UINT id, int *deg100)
  */
 int b3m_servo_mode(B3MData * r, UINT id, UCHAR option)
 {
-	printf("b3m_servo_mode\n");
+//	printf("b3m_servo_mode\n");
 	assert(r);
 
 	UCHAR data[2];
@@ -478,7 +478,7 @@ int b3m_servo_mode(B3MData * r, UINT id, UCHAR option)
  */
 int b3m_get_current(B3MData * r, UINT id, int *current_mA)
 {
-	printf("b3m_get_current\n");
+//	printf("b3m_get_current\n");
 	assert(r);
 
 	int err;
@@ -502,7 +502,7 @@ int b3m_get_current(B3MData * r, UINT id, int *current_mA)
  */
 int b3m_get_pwm_duty_ratio(B3MData * r, UINT id, int *duty_ratio)
 {
-	printf("b3m_get_duty_ratio\n");
+//	printf("b3m_get_duty_ratio\n");
 	assert(r);
 
 	int err;
@@ -537,7 +537,7 @@ int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch)
  */
 int b3m_set_speed(B3MData * r, UINT id, int deg100)
 {
-	printf("b3m_set_speed\n");
+//	printf("b3m_set_speed\n");
 	assert(r);
 
 	UCHAR data[2];
@@ -557,7 +557,7 @@ int b3m_set_speed(B3MData * r, UINT id, int deg100)
  */
 int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim_mA)
 {
-	printf("b3m_set_current_limit\n");
+//	printf("b3m_set_current_limit\n");
 	assert(r);
 
 	UCHAR data[2];
@@ -576,7 +576,7 @@ int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim_mA)
  */
 int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim)
 {
-	printf("b3m_set_temperature_limit\n");
+//	printf("b3m_set_temperature_limit\n");
 	assert(r);
 
 	UCHAR data[2];
@@ -593,7 +593,7 @@ int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim)
  */
 int b3m_get_id(B3MData * r)
 {
-	printf("b3m_get_id\n");
+//	printf("b3m_get_id\n");
 	assert(r);
 	int i;
 
@@ -619,7 +619,7 @@ int b3m_get_id(B3MData * r)
  */
 int b3m_set_id(B3MData * r, UINT id)
 {
-	printf("b3m_set_id\n");
+//	printf("b3m_set_id\n");
 	assert(r);
 	int i;
 
