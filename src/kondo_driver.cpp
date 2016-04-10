@@ -78,11 +78,11 @@ public:
 		}
 		if (!loopback) {
 			// Check motor existence
-			if (b3m_servo_mode(b3m, id, B3M_OPTIONS_RUN_NORMAL) <= 0) {
+			if (b3m_servo_mode(b3m, id, B3M_OPTIONS_RUN_NORMAL)) {
 				ROS_WARN("Cannot connect to servo ID: %d", id);
 			}
 		}
-		if (b3m_set_trajectory_mode(b3m, id, B3M_OPTIONS_TRAJECTORY_4) <= 0) {
+		if (b3m_set_trajectory_mode(b3m, id, B3M_OPTIONS_TRAJECTORY_4)) {
 			ROS_WARN("Cannot set trajectory mode to servo ID: %d", id);
 		}
 		if (nh.getParam("joint_name", joint_name)) {
