@@ -23,10 +23,13 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <linux/serial.h>
 
 #include "kondo_driver/b3m.h"
 
 int target_deg100[256];
+
+#define BAUDRATE 1500000
 
 // Convenience macros
 #define b3m_error(ki, err) { \
@@ -36,7 +39,7 @@ int target_deg100[256];
 
 /*!
  * @brief Iniitialize the B3M interface
- * 115200 baud, 8 bits, even parity, 1 stop bit
+ * 1500000 baud, 8 bits, even parity, 1 stop bit
  *
  * @return 0 if successful, < 0 otherwise
  */
@@ -59,6 +62,20 @@ int b3m_init(B3MData * r, const char* serial_port)
 		b3m_error(r, "Set serial port parameters");
 	}
 
+	struct serial_struct sstruct;
+
+	if (ioctl(r->fd, TIOCGSERIAL, &sstruct) < 0) {
+		printf("Error: could not get comm ioctl\n");
+		exit(-1);
+	}
+
+	sstruct.custom_divisor = sstruct.baud_base / BAUDRATE;
+	sstruct.flags |= ASYNC_SPD_CUST;
+
+	if (ioctl(r->fd, TIOCSSERIAL, &sstruct) < 0) {
+		printf("Error: could not set custom comm baud divisor\n");
+		exit(-1);
+	}
 	for(i = 0; i < 256; i ++) target_deg100[i] = 100000;
 
 	return 0;
