@@ -38,6 +38,12 @@ l_wrist_yaw_controller:
   base_frame_id: base_link
   joint: l_wrist_yaw_joint
 
+l_hand_controller:
+    type: position_controllers/JointPositionController
+    publish_rate: 20
+    base_frame_id: base_link
+    joint : l_hand_joint
+
 r_sholder_pitch_controller:
   type: position_controllers/JointPositionController
   publish_rate: 50
