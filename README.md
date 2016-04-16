@@ -1,4 +1,4 @@
-# Kondo ICS motor driver
+# Kondo B3M motor driver
 
 This ROS package contains hardware interface to Kondo Kagaku's ICS
 motor system. ICS(Interactive Communication System) is a kind of
