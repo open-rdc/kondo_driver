@@ -1,0 +1,121 @@
+product_id: 0x0006
+
+l_sholder_pitch_driver:
+  joint_name: l_sholder_pitch_joint
+  id: 21
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+l_sholder_roll_driver:
+  joint_name: l_sholder_roll_joint
+  id: 22
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+l_elbow_roll_driver:
+  joint_name: l_elbow_roll_joint
+  id: 23
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+l_wrist_roll_driver:
+  joint_name: l_wrist_roll_joint
+  id: 24
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+l_wrsit_pitch_driver:
+  joint_name: l_wrist_pitch_joint
+  id: 25
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+l_wrist_yaw_driver:
+  joint_name: l_wrist_yaw_joint
+  id: 26
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+r_sholder_pitch_driver:
+  joint_name: r_sholder_pitch_joint
+  id: 11
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+r_sholder_roll_driver:
+  joint_name: r_sholder_roll_joint
+  id: 12
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+r_elbow_roll_driver:
+  joint_name: r_elbow_roll_joint
+  id: 13
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+r_wrist_roll_driver:
+  joint_name: r_wrist_roll_joint
+  id: 14
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+r_wrsit_pitch_driver:
+  joint_name: r_wrist_pitch_joint
+  id: 15
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
+
+r_wrist_yaw_driver:
+  joint_name: r_wrist_yaw_joint
+  id: 16
+  min_angle: -135
+  max_angle: 135
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temprature_limit: 80
