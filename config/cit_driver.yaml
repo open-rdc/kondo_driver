@@ -1,7 +1,7 @@
 product_id: 0x0006
 
-l_sholder_pitch_driver:
-  joint_name: l_sholder_pitch_joint
+l_shoulder_pitch_driver:
+  joint_name: l_shoulder_pitch_joint
   id: 21
   min_angle: -135
   max_angle: 135
@@ -10,8 +10,8 @@ l_sholder_pitch_driver:
   current_limit: 30
   temprature_limit: 80
 
-l_sholder_roll_driver:
-  joint_name: l_sholder_roll_joint
+l_shoulder_roll_driver:
+  joint_name: l_shoulder_roll_joint
   id: 22
   min_angle: -135
   max_angle: 135
@@ -40,7 +40,7 @@ l_wrist_roll_driver:
   current_limit: 30
   temprature_limit: 80
 
-l_wrsit_pitch_driver:
+l_wrist_pitch_driver:
   joint_name: l_wrist_pitch_joint
   id: 25
   min_angle: -135
@@ -70,8 +70,8 @@ l_hand_driver:
   current_limit: 30
   temperature_limit: 80
 
-r_sholder_pitch_driver:
-  joint_name: r_sholder_pitch_joint
+r_shoulder_pitch_driver:
+  joint_name: r_shoulder_pitch_joint
   id: 11
   min_angle: -135
   max_angle: 135
@@ -80,8 +80,8 @@ r_sholder_pitch_driver:
   current_limit: 30
   temprature_limit: 80
 
-r_sholder_roll_driver:
-  joint_name: r_sholder_roll_joint
+r_shoulder_roll_driver:
+  joint_name: r_shoulder_roll_joint
   id: 12
   min_angle: -135
   max_angle: 135
@@ -129,3 +129,13 @@ r_wrist_yaw_driver:
   speed: 127
   current_limit: 30
   temprature_limit: 80
+
+r_hand_driver:
+  joint_name: r_hand_joint
+  id: 17
+  min_angle: 0
+  max_angle: 90
+  stretch: 60
+  speed: 127
+  current_limit: 30
+  temperature_limit: 80
