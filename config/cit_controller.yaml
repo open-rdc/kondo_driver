@@ -2,17 +2,17 @@ joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
 
-l_shoulder_pitch_controller:
+l_sholder_pitch_controller:
   type: position_controllers/JointPositionController
   publish_rate: 50
   base_frame_id: base_link
-  joint: l_shoulder_pitch_joint
+  joint: l_sholder_pitch_joint
 
-l_shoulder_roll_controller:
+l_sholder_roll_controller:
   type: position_controllers/JointPositionController
   publish_rate: 50
   base_frame_id: base_link
-  joint: l_shoulder_roll_joint
+  joint: l_sholder_roll_joint
 
 l_elbow_roll_controller:
   type: position_controllers/JointPositionController
@@ -44,17 +44,17 @@ l_hand_controller:
   base_frame_id: base_link
   joint : l_hand_joint
 
-r_shoulder_pitch_controller:
+r_sholder_pitch_controller:
   type: position_controllers/JointPositionController
   publish_rate: 50
   base_frame_id: base_link
-  joint: r_shoulder_pitch_joint
+  joint: r_sholder_pitch_joint
 
-r_shoulder_roll_controller:
+r_sholder_roll_controller:
   type: position_controllers/JointPositionController
   publish_rate: 50
   base_frame_id: base_link
-  joint: r_shoulder_roll_joint
+  joint: r_sholder_roll_joint
 
 r_elbow_roll_controller:
   type: position_controllers/JointPositionController
