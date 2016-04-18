@@ -2,41 +2,41 @@ joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
 
-l_sholder_pitch_controller:
-  type: position_controllers/JointPositionController
-  publish_rate: 50
-  base_frame_id: base_link
-  joint: l_sholder_pitch_joint
+#l_sholder_pitch_controller:
+#  type: position_controllers/JointPositionController
+#  publish_rate: 50
+#  base_frame_id: base_link
+#  joint: l_sholder_pitch_joint
 
-l_sholder_roll_controller:
-  type: position_controllers/JointPositionController
-  publish_rate: 50
-  base_frame_id: base_link
-  joint: l_sholder_roll_joint
+#l_sholder_roll_controller:
+#  type: position_controllers/JointPositionController
+#  publish_rate: 50
+#  base_frame_id: base_link
+#  joint: l_sholder_roll_joint
 
-l_elbow_roll_controller:
-  type: position_controllers/JointPositionController
-  publish_rate: 50
-  base_frame_id: base_link
-  joint: l_elbow_roll_joint
+#l_elbow_roll_controller:
+#  type: position_controllers/JointPositionController
+#  publish_rate: 50
+#  base_frame_id: base_link
+#  joint: l_elbow_roll_joint
 
-l_wrist_roll_controller:
-  type: position_controllers/JointPositionController
-  publish_rate: 50
-  base_frame_id: base_link
-  joint: l_wrist_roll_joint
+#l_wrist_roll_controller:
+#  type: position_controllers/JointPositionController
+#  publish_rate: 50
+#  base_frame_id: base_link
+#  joint: l_wrist_roll_joint
 
-l_wrist_pitch_controller:
-  type: position_controllers/JointPositionController
-  publish_rate: 50
-  base_frame_id: base_link
-  joint: l_wrist_pitch_joint
+#l_wrist_pitch_controller:
+#  type: position_controllers/JointPositionController
+#  publish_rate: 50
+#  base_frame_id: base_link
+#  joint: l_wrist_pitch_joint
 
-l_wrist_yaw_controller:
-  type: position_controllers/JointPositionController
-  publish_rate: 50
-  base_frame_id: base_link
-  joint: l_wrist_yaw_joint
+#l_wrist_yaw_controller:
+#  type: position_controllers/JointPositionController
+#  publish_rate: 50
+#  base_frame_id: base_link
+#  joint: l_wrist_yaw_joint
 
 l_hand_controller:
   type: position_controllers/JointPositionController
@@ -86,13 +86,14 @@ r_hand_controller:
   base_frame_id: base_link
   joint : r_hand_joint
 
-left_arm_controller:
-  type: effort_controllers/JointTrajectoryController
-  joints:
-    - l_sholder_pitch_joint
-    - l_sholder_roll_joint
-    - l_elbow_roll_joint
-    - l_wrist_roll_joint
-    - l_wrist_pitch_joint
-    - l_wrist_yaw_joint
+manipulator:
+  left_arm_controller:
+    type: position_controllers/JointTrajectoryController
+    joints:
+      - l_sholder_pitch_joint
+      - l_sholder_roll_joint
+      - l_elbow_roll_joint
+      - l_wrist_roll_joint
+      - l_wrist_pitch_joint
+      - l_wrist_yaw_joint
 

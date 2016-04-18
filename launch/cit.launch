@@ -4,11 +4,14 @@
   <!-- Start B3M driver -->
   <node name="kondo_driver" pkg="kondo_driver" type="kondo_driver" args="fake:=true l_hand_driver l_wrist_yaw_driver l_wrist_pitch_driver l_wrist_roll_driver l_elbow_roll_driver l_sholder_roll_driver l_sholder_pitch_driver" output="screen" />
   <!-- Load URDF model -->
-  <param name="robot_description" command="cat $(find kondo_driver)/urdf/sample.urdf" />
+	<arg name="model" default="$(find cit_description)/urdf/manipulator.urdf" />
+	<param name="robot_description" textfile="$(arg model)" />
+
+<!--  <param name="robot_description" command="cat $(find kondo_driver)/urdf/sample.urdf" /> -->
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find kondo_driver)/config/cit_controller.yaml" command="load"/>
   <!-- Load the controllers -->
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="--shutdown-timeout 0.1 joint_state_controller l_hand_controller l_wrist_yaw_controller l_wrist_pitch_controller l_wrist_roll_controller l_elbow_roll_controller l_sholder_roll_controller l_sholder_pitch_controller left_arm_controller"/>
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="--shutdown-timeout 0.1 joint_state_controller /manipulator/left_arm_controller"/>
   <!-- Robot state publisher -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen" />
 
