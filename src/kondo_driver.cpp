@@ -139,15 +139,15 @@ public:
 			}
 
 			/* get speed */
-			vel = 0;
-			if (!b3m_get_velocity(b3m, id, &deg100)){
-				vel = deg100_to_radian(deg100);
-			}
+//			vel = 0;
+//			if (!b3m_get_velocity(b3m, id, &deg100)){
+//				vel = deg100_to_radian(deg100);
+//			}
 
 			/* get servo current */
-			int pwm_duty_ratio;
-			b3m_get_pwm_duty_ratio(b3m, id, &pwm_duty_ratio);
-			eff = pwm_duty_ratio;
+//			int pwm_duty_ratio;
+//			b3m_get_pwm_duty_ratio(b3m, id, &pwm_duty_ratio);
+//			eff = pwm_duty_ratio;
 		}
     }
 
