@@ -218,8 +218,8 @@ int b3m_get_stretch(B3MData * r, UINT id);
 int b3m_get_current(B3MData * r, UINT id, int *current_mA);
 int b3m_set_stretch(B3MData * r, UINT id, UCHAR stretch);
 int b3m_set_speed(B3MData * r, UINT id, int speed);
-int b3m_set_current_limit(B3MData * r, UINT id, UCHAR curlim);
-int b3m_set_temperature_limit(B3MData * r, UINT id, UCHAR templim);
+int b3m_set_current_limit(B3MData * r, UINT id, int curlim);
+int b3m_set_temperature_limit(B3MData * r, UINT id, int templim);
 
 // set servo id (for use when 1 servo is connected)
 int b3m_get_id(B3MData * r);

@@ -11,63 +11,45 @@
 #include "hardware_interface/actuator_state_interface.h"
 #include "hardware_interface/robot_hw.h"
 extern "C" {
-#include "kondo_driver/ics.h"
 #include "kondo_driver/b3m.h"
 }
 #include "kondo_driver/setPower.h"
 
-/* Maximum motor num (32 is maximum on spec. sheet) */
-const int MAX_MOTOR_NUM = 12;
-const int MAX_PULSE = 11500;
-const int MIN_PULSE = 3500;
-const int CNT_PULSE = 7500;
-const double RADIAN_PER_PULSE = 270.0*M_PI/(MAX_PULSE-MIN_PULSE)/180.0;
 const double RAD_TO_DEG = 180.0/M_PI*100;
-
-double pulse_to_radian (double pulse)
-{
-    return (pulse - CNT_PULSE)*RADIAN_PER_PULSE;
-}
-
-int radian_to_pulse (double radian)
-{
-    return CNT_PULSE + radian/RADIAN_PER_PULSE;
-}
 
 double deg100_to_radian (double deg100)
 {
-    return deg100/RAD_TO_DEG;
+	return deg100/RAD_TO_DEG;
 }
 
 int radian_to_deg100 (double radian)
 {
-    return radian*RAD_TO_DEG;
+	return radian*RAD_TO_DEG;
 }
 
 class KondoMotor {
 private:
-    bool loopback;
-    bool motor_power;
-    ros::ServiceServer power_service;
-    int id;
-    ICSData* ics;
+	bool loopback;
+	bool motor_power;
+	ros::ServiceServer power_service;
+	int id;
 	B3MData* b3m;
-    int stretch;
-    int speed;
-    int curr_limit; // current limit
-    int temp_limit;
-    int min_angle, max_angle;
+	int stretch;
+	int speed;
+	int curr_limit; // current limit
+	int temp_limit;
+	int min_angle, max_angle;
 public:
-    double cmd, pos, vel, eff;
-    std::string joint_name;
-    
+	double cmd, pos, vel, eff;
+	std::string joint_name;
+	
 	bool set_power (kondo_driver::setPower::Request &req, kondo_driver::setPower::Response &res) {
 		ROS_INFO("id %d, request: %d", this->id, req.request);
 		motor_power = req.request;
 		res.result = req.request;
 		return true;
-    }
-    
+	}
+	
 	KondoMotor (B3MData* b3m, std::string actuator_name, hardware_interface::JointStateInterface& state_interface, hardware_interface::PositionJointInterface& pos_interface, bool loopback=false) : cmd(0), pos(0), vel(0), eff(0) {
 		motor_power = true;
 		this->loopback = loopback;
@@ -104,20 +86,20 @@ public:
 		}
 		if (nh.getParam("current_limit", curr_limit)) {
 			ROS_INFO("current_limit: %d", curr_limit);
-//			set_current_limit(curr_limit);
+			set_current_limit(curr_limit);
 		}
 		if (nh.getParam("temperature_limit", temp_limit)) {
 			ROS_INFO("temperature_limit: %d", temp_limit);
-//			set_temperature_limit(temp_limit);
+			set_temperature_limit(temp_limit * 100);
 		}
 		hardware_interface::JointStateHandle state_handle(joint_name, &pos, &vel, &eff);
 		state_interface.registerHandle(state_handle);
 		hardware_interface::JointHandle pos_handle(state_interface.getHandle(joint_name), &cmd);
 		pos_interface.registerHandle(pos_handle);
 		power_service = nh.advertiseService(actuator_name+std::string("/set_power"), &KondoMotor::set_power, this);
-    }
+	}
 
-    void update (void) {
+	void update (void) {
 		static const int DESIRED_VELOCITY = 2000;	// for safty
 		int deg100 = 0;				// degree * 100
 		double radian = cmd;
@@ -149,10 +131,10 @@ public:
 //			b3m_get_pwm_duty_ratio(b3m, id, &pwm_duty_ratio);
 //			eff = pwm_duty_ratio;
 		}
-    }
+	}
 
-    // Set speed parameter
-    void set_speed (unsigned char speed) {
+	// Set speed parameter
+	void set_speed (unsigned char speed) {
 		if (loopback) {
 			this->speed = speed;
 		}else {
@@ -169,10 +151,10 @@ public:
 			this->stretch = b3m_set_stretch(b3m, id, stretch);
 			ROS_INFO("%s: %d", __func__, this->stretch);
 		}
-    }
+	}
 
-    // Set current limit 
-    void set_current_limit (unsigned char curr) {
+	// Set current limit 
+	void set_current_limit (unsigned char curr) {
 		if (loopback) {
 			curr_limit = curr;
 		}else {
@@ -188,22 +170,22 @@ public:
 			this->temp_limit = b3m_set_temperature_limit(b3m, id, temp);
 			ROS_INFO("%s: %d", __func__, this->temp_limit);
 		}
-    }
+	}
 };
 
 class KondoDriver : public hardware_interface::RobotHW
 {
   private:
-    bool loopback;
-    // Hardware interface
-    hardware_interface::JointStateInterface jnt_state_interface;
-    hardware_interface::PositionJointInterface jnt_pos_interface;
-    // B3M hardware resource
-    B3MData b3m;
-    // Vector of motors
-    std::vector<boost::shared_ptr<KondoMotor> > actuator_vector;
+	bool loopback;
+	// Hardware interface
+	hardware_interface::JointStateInterface jnt_state_interface;
+	hardware_interface::PositionJointInterface jnt_pos_interface;
+	// B3M hardware resource
+	B3MData b3m;
+	// Vector of motors
+	std::vector<boost::shared_ptr<KondoMotor> > actuator_vector;
   public:
-    KondoDriver (int num, char** actuators) {
+	KondoDriver (int num, char** actuators) {
 		ros::NodeHandle nh("~");
 		std::string serial_port;
 		nh.param<std::string>("serial_port", serial_port, "/dev/ttyUSB0");
@@ -229,47 +211,47 @@ class KondoDriver : public hardware_interface::RobotHW
 		}
 		registerInterface(&jnt_state_interface);
 		registerInterface(&jnt_pos_interface);
-    }
+	}
 
-    // Read & write function
-    void update () {
+	// Read & write function
+	void update () {
 		for (int i=0; i<actuator_vector.size(); i++) {
 		  //ROS_INFO("%s: %d", __func__, i);
 			actuator_vector[i]->update();
 		}
-    }
+	}
 
-    ~KondoDriver () {
+	~KondoDriver () {
 		if (!loopback) {
 			b3m_close (&b3m);
 		}
-    }
-    ros::Time getTime() const {return ros::Time::now();}
-    ros::Duration getPeriod() const {return ros::Duration(0.01);}
+	}
+	ros::Time getTime() const {return ros::Time::now();}
+	ros::Duration getPeriod() const {return ros::Duration(0.01);}
 };
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "kondo_driver");
-    ros::NodeHandle nh;
+	ros::init(argc, argv, "kondo_driver");
+	ros::NodeHandle nh;
 
-    // Create hardware interface 
-    KondoDriver robot(argc-1, &argv[1]);
-    // Connect to controller manager
-    controller_manager::ControllerManager cm(&robot, nh);
+	// Create hardware interface 
+	KondoDriver robot(argc-1, &argv[1]);
+	// Connect to controller manager
+	controller_manager::ControllerManager cm(&robot, nh);
 
-    ros::Rate rate(1.0 / robot.getPeriod().toSec());
-    ros::AsyncSpinner spinner(1);
-    spinner.start();
+	ros::Rate rate(1.0 / robot.getPeriod().toSec());
+	ros::AsyncSpinner spinner(1);
+	spinner.start();
 
-    while(ros::ok()){
+	while(ros::ok()){
 		cm.update(robot.getTime(), robot.getPeriod());
 		robot.update();
 		rate.sleep();
-    }
-    spinner.stop();
+	}
+	spinner.stop();
 
-    return 0;
+	return 0;
 }
 
 
