@@ -48,7 +48,7 @@ int b3m_init(B3MData * r, const char* serial_port)
 	int i;
 	printf("b3m_init\n");
 	assert(r);
-	r->debug = 0;
+	r->debug = 1;
 
 	struct termios tio;
 
@@ -388,6 +388,8 @@ int b3m_set_angle_period(B3MData * r, UINT id, int *deg100, int period_ms)
 int b3m_set_angle_velocity(B3MData * r, UINT id, int *deg100, int velocity_deg100)
 {
 	int current_deg100;
+	if (*deg100 == target_deg100[id]) return 0;
+	
 	if (b3m_get_angle(r, id, &current_deg100)){
 		b3m_error(r, "get angle");
 	}
