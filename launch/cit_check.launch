@@ -18,15 +18,15 @@
 
   <!-- Joint state publisher -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-     <remap from="joint_states" to="joint_commands"/>
+<!--     <remap from="joint_states" to="joint_commands"/>   -->
   </node>
 
-  <node name="cmd_transform_l_sholder_pitch" pkg="topic_tools" type="transform" output="screen" args="/joint_commands /l_sholder_pitch_controller/command std_msgs/Float64 'm.position[1]'"/>
-  <node name="cmd_transform_l_sholder_roll" pkg="topic_tools" type="transform" args="/joint_commands /l_sholder_roll_controller/command std_msgs/Float64 'm.position[2]'"/>
-  <node name="cmd_transform_l_elbow_roll" pkg="topic_tools" type="transform" args="/joint_commands /l_elbow_roll_controller/command std_msgs/Float64 'm.position[3]'"/>
-  <node name="cmd_transform_l_wrist_roll" pkg="topic_tools" type="transform" args="/joint_commands /l_wrist_roll_controller/command std_msgs/Float64 'm.position[4]'"/>
-  <node name="cmd_transform_l_wrist_pitch" pkg="topic_tools" type="transform" args="/joint_commands /l_wrist_pitch_controller/command std_msgs/Float64 'm.position[5]'"/>
-  <node name="cmd_transform_l_wrist_yaw" pkg="topic_tools" type="transform" args="/joint_commands /l_wrist_yaw_controller/command std_msgs/Float64 'm.position[6]'"/>
+  <node name="cmd_transform_l_sholder_pitch" pkg="topic_tools" type="transform" output="screen" args="/joint_states /l_sholder_pitch_controller/command std_msgs/Float64 'm.position[1]'"/>
+  <node name="cmd_transform_l_sholder_roll" pkg="topic_tools" type="transform" args="/joint_states /l_sholder_roll_controller/command std_msgs/Float64 'm.position[2]'"/>
+  <node name="cmd_transform_l_elbow_roll" pkg="topic_tools" type="transform" args="/joint_states /l_elbow_roll_controller/command std_msgs/Float64 'm.position[3]'"/>
+  <node name="cmd_transform_l_wrist_roll" pkg="topic_tools" type="transform" args="/joint_states /l_wrist_roll_controller/command std_msgs/Float64 'm.position[4]'"/>
+  <node name="cmd_transform_l_wrist_pitch" pkg="topic_tools" type="transform" args="/joint_states /l_wrist_pitch_controller/command std_msgs/Float64 'm.position[5]'"/>
+  <node name="cmd_transform_l_wrist_yaw" pkg="topic_tools" type="transform" args="/joint_states /l_wrist_yaw_controller/command std_msgs/Float64 'm.position[6]'"/>
 
   <!-- Robot state publisher -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen" />
