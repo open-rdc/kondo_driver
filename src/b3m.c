@@ -48,7 +48,7 @@ int b3m_init(B3MData * r, const char* serial_port)
 	int i;
 	printf("b3m_init\n");
 	assert(r);
-	r->debug = 1;
+	r->debug = 0;
 
 	struct termios tio;
 
