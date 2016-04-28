@@ -2,7 +2,9 @@
   <!-- Load Kondo B3M parameters -->
   <rosparam file="$(find kondo_driver)/config/cit_driver.yaml" command="load" ns="kondo_driver"/>
   <!-- Start B3M driver -->
-  <node name="kondo_driver" pkg="kondo_driver" type="kondo_driver" args="fake:=true l_sholder_pitch_driver l_sholder_roll_driver l_elbow_roll_driver l_wrist_roll_driver l_wrist_pitch_driver l_wrist_yaw_driver" output="screen" />
+  <node name="kondo_driver" pkg="kondo_driver" type="kondo_driver" args="fake:=true l_sholder_pitch_driver l_sholder_roll_driver l_elbow_roll_driver l_wrist_roll_driver l_wrist_pitch_driver l_wrist_yaw_driver" output="screen" >
+    <remap from="joint_states" to="dummy" />
+  </node>
 
   <!-- Load URDF model -->
 	<arg name="model" default="$(find cit_description)/urdf/manipulator.urdf" />
@@ -10,18 +12,15 @@
 	<param name="robot_description" textfile="$(arg model)" />
 	<param name="use_gui" value="$(arg gui)" />
 
-<!--  <param name="robot_description" command="cat $(find kondo_driver)/urdf/sample.urdf" /> -->
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find kondo_driver)/config/cit_controller_check.yaml" command="load"/>
   <!-- Load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="--shutdown-timeout 0.1 joint_state_controller l_sholder_pitch_controller l_sholder_roll_controller l_elbow_roll_controller l_wrist_roll_controller l_wrist_pitch_controller l_wrist_yaw_controller"/>
 
   <!-- Joint state publisher -->
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-<!--     <remap from="joint_states" to="joint_commands"/>   -->
-  </node>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
 
-  <node name="cmd_transform_l_sholder_pitch" pkg="topic_tools" type="transform" output="screen" args="/joint_states /l_sholder_pitch_controller/command std_msgs/Float64 'm.position[1]'"/>
+  <node name="cmd_transform_l_sholder_pitch" pkg="topic_tools" type="transform" args="/joint_states /l_sholder_pitch_controller/command std_msgs/Float64 'm.position[1]'"/>
   <node name="cmd_transform_l_sholder_roll" pkg="topic_tools" type="transform" args="/joint_states /l_sholder_roll_controller/command std_msgs/Float64 'm.position[2]'"/>
   <node name="cmd_transform_l_elbow_roll" pkg="topic_tools" type="transform" args="/joint_states /l_elbow_roll_controller/command std_msgs/Float64 'm.position[3]'"/>
   <node name="cmd_transform_l_wrist_roll" pkg="topic_tools" type="transform" args="/joint_states /l_wrist_roll_controller/command std_msgs/Float64 'm.position[4]'"/>
