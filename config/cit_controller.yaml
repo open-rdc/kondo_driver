@@ -1,6 +1,6 @@
 joint_state_controller:
   type: joint_state_controller/JointStateController
-  publish_rate: 50
+  publish_rate: 10
 
 #l_sholder_pitch_controller:
 #  type: position_controllers/JointPositionController
@@ -96,4 +96,26 @@ manipulator:
       - l_wrist_roll_joint
       - l_wrist_pitch_joint
       - l_wrist_yaw_joint
+    action_monitor_rate: 10
+    constraints:
+      goal_time: 1.0
+      stopped_velocity_tolerance: 1.0
+      l_sholder_pitch_joint:
+        trajectory: 1.0
+        goal: 1.0
+      l_sholder_roll_joint:
+        trajectory: 1.0
+        goal: 1.0
+      l_elbow_roll_joint:
+        trajectory: 1.0
+        goal: 1.0
+      l_wrist_roll_joint:
+        trajectory: 1.0
+        goal: 1.0
+      l_wrist_pitch_joint:
+        trajectory: 1.0
+        goal: 1.0
+      l_wrist_yaw_joint:
+        trajectory: 1.0
+        goal: 1.0
 
