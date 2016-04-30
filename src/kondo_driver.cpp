@@ -138,40 +138,57 @@ public:
 	}
 
 	// Set speed parameter
-	void set_speed (unsigned char speed) {
+	void set_speed (int speed) {
 		if (loopback) {
 			this->speed = speed;
 		}else {
-			this->speed = b3m_set_speed(b3m, id, speed);
+			if (!b3m_set_speed(b3m, id, speed)){
+				this->speed = speed;
+			} else {
+				this->speed = 0;
+			}
 			ROS_INFO("%s: %d", __func__, this->speed);
 		}
 	}
 
 	// Set strech parameter
-	void set_stretch (unsigned char stretch) {
+	void set_stretch (int stretch) {
 		if (loopback) {
 			this->stretch = stretch;
 		}else {
-			this->stretch = b3m_set_stretch(b3m, id, stretch);
+			if (!b3m_set_stretch(b3m, id, stretch)){
+				this->stretch = stretch;
+			} else {
+				this->stretch = 0;
+			}
 			ROS_INFO("%s: %d", __func__, this->stretch);
 		}
 	}
 
 	// Set current limit 
-	void set_current_limit (unsigned char curr) {
+	void set_current_limit (int curr) {
 		if (loopback) {
 			curr_limit = curr;
 		}else {
-			this->curr_limit = b3m_set_stretch(b3m, id, curr);
+			if (!b3m_set_current_limit(b3m, id, curr)){
+				this->curr_limit = curr;
+			} else {
+				this->curr_limit = 0;
+			}
 			ROS_INFO("%s: %d", __func__, this->curr_limit);
 		}
-		}
-		// Set temperature limit
-		void set_temperature_limit (unsigned char temp) {
+	}
+
+	// Set temperature limit
+	void set_temperature_limit (int temp) {
 		if (loopback) {
 			temp_limit = temp;
 		}else {
-			this->temp_limit = b3m_set_temperature_limit(b3m, id, temp);
+			if (!b3m_set_temperature_limit(b3m, id, temp)){
+				this->temp_limit = temp;
+			} else {
+				this->temp_limit = 0;
+			}
 			ROS_INFO("%s: %d", __func__, this->temp_limit);
 		}
 	}
