@@ -3,8 +3,8 @@ product_id: 0x0006
 l_sholder_pitch_driver:
   joint_name: l_sholder_pitch_joint
   id: 21
-  min_angle: -135
-  max_angle: 135
+  min_angle: -320
+  max_angle: 320
   stretch: 60
   speed: 127
   current_limit: 3000
@@ -13,8 +13,8 @@ l_sholder_pitch_driver:
 l_sholder_roll_driver:
   joint_name: l_sholder_roll_joint
   id: 22
-  min_angle: -135
-  max_angle: 135
+  min_angle: -90
+  max_angle: 90
   stretch: 60
   speed: 127
   current_limit: 3000
@@ -23,8 +23,8 @@ l_sholder_roll_driver:
 l_elbow_roll_driver:
   joint_name: l_elbow_roll_joint
   id: 23
-  min_angle: -135
-  max_angle: 135
+  min_angle: 0
+  max_angle: 180
   stretch: 60
   speed: 127
   current_limit: 3000
@@ -33,8 +33,8 @@ l_elbow_roll_driver:
 l_wrist_roll_driver:
   joint_name: l_wrist_roll_joint
   id: 24
-  min_angle: -135
-  max_angle: 135
+  min_angle: -90
+  max_angle: 90
   stretch: 60
   speed: 127
   current_limit: 3000
@@ -43,8 +43,8 @@ l_wrist_roll_driver:
 l_wrist_pitch_driver:
   joint_name: l_wrist_pitch_joint
   id: 25
-  min_angle: -135
-  max_angle: 135
+  min_angle: -90
+  max_angle: 90
   stretch: 60
   speed: 127
   current_limit: 3000
@@ -53,8 +53,8 @@ l_wrist_pitch_driver:
 l_wrist_yaw_driver:
   joint_name: l_wrist_yaw_joint
   id: 26
-  min_angle: -135
-  max_angle: 135
+  min_angle: -320
+  max_angle: 320
   stretch: 60
   speed: 127
   current_limit: 3000
