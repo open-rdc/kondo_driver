@@ -18,7 +18,23 @@ This package contains ics read/write code (ics.c, ics.h) from [libkondo4 project
 * [KRS-4031HV ICS](http://kondo-robot.com/product/krs-4031hv-ics)
 * [KRS-4032HV ICS](http://kondo-robot.com/product/krs-4032hv-ics)
 
+## Install necessary packages
+```
+sudo apt-get install ros-<distribution>-joint-state-controller
+sudo apt-get install ros-<distribution>-effort-controllers
+sudo apt-get install ros-<distribution>-position-controllers
+`````
+
 # Quick start
+
+## Detect device driver
+```
+sudo modprobe ftdi_sio
+sudo su
+echo "165C 0009" > /sys/bus/usb-serial/drivers/ftdi_sio\new_id
+exit
+sudo chmod 0666 /dev/ttyUSB<serial adapter port>
+```
 
 ## Setting servo ID.
 Connect each servo and the adapter one to one.
