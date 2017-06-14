@@ -31,7 +31,7 @@ sudo apt-get install ros-<distribution>-position-controllers
 ```
 sudo modprobe ftdi_sio
 sudo su
-echo "165C 0009" > /sys/bus/usb-serial/drivers/ftdi_sio\new_id
+echo "165C 0009" > /sys/bus/usb-serial/drivers/ftdi_sio/new_id
 exit
 sudo chmod 0666 /dev/ttyUSB<serial adapter port>
 ```
