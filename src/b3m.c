@@ -308,6 +308,8 @@ int b3m_get_status(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
 		data[i] = r->swap[i + 4];
 	}
 
+	printf("GET STATUS DATA VALUE: %s", data);
+
 	// return error status
 	return r->swap[2];
 }
