@@ -262,11 +262,6 @@ int b3m_com_send(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
 	}
 	r->swap[n] = sum & 0xff;
 
-    printf("SENT DATA: ");
-	for (i=0; i<n+1; i++) {
-		printf("%x ", r->swap[i]);
-	}
-	printf("\n");
 	// synchronize with servo
 	if ((i = b3m_trx_timeout(r, 7 + byte, 5, B3M_POS_TIMEOUT)) < 0)
 		return i;
