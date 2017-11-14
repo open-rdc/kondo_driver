@@ -51,13 +51,25 @@ int b3m_init(B3MData * r, const char* serial_port)
 	r->debug = 0;
 
 	struct termios tio;
-
-	r->fd = open(serial_port, O_RDWR);
+	
+	r->fd = open(serial_port, O_RDWR | O_NOCTTY);
+	
 	if (ioctl(r->fd, TCGETS, &tio)){
 		b3m_error(r, "Get serial port parameters");
 	}
 	tio.c_cflag &= ~CBAUD;
 	tio.c_cflag |= B3M_BAUD;
+	tio.c_cflag &= ~PARENB; //set no parity
+	tio.c_cflag &= ~CSTOPB; //1 stop bit
+	tio.c_cflag &= ~CSIZE; //clear mask for setting the data size
+	tio.c_cflag |= CS8;
+	tio.c_cflag |= CREAD;
+	tio.c_cflag |= CLOCAL;
+	tio.c_iflag = IGNBRK | IGNPAR;
+	tio.c_oflag = 0;
+	tio.c_lflag = 0;
+	tcflush(r->fd, TCIOFLUSH);
+
 	if (ioctl(r->fd, TCSETS, &tio)){
 		b3m_error(r, "Set serial port parameters");
 	}
@@ -78,6 +90,20 @@ int b3m_init(B3MData * r, const char* serial_port)
 	}
 	for(i = 0; i < 256; i ++) target_deg100[i] = 100000;
 
+//	tcgetattr(r->fd, &tio);
+//	printf("%d, %d\n", tio.c_cc[VTIME], tio.c_cc[VMIN]);	
+
+	//tcflush(r->fd, TCIFLUSH);
+	//usleep(10000);
+	//tcdrain(r->fd);
+	//int flags = fcntl(r->fd, F_GETFL, 0);
+	//fcntl(r->fd, F_SETFL, flags | O_NONBLOCK);
+	//int opt = 1;
+	//ioctl(r->fd, FIONBIO, &opt);
+	//ioctl(r->fd, TIOCMBIC, TIOCM_RTS);
+	//ioctl(r->fd, TIOCMBIC, TIOCM_DTR);
+	//fcntl(r->fd, F_SETFL, flags | O_NONBLOCK);
+//	usleep(10000);
 	return 0;
 }
 
@@ -206,7 +232,6 @@ int b3m_trx_timeout(B3MData * r, UINT bytes_out, UINT bytes_in, long timeout)
 
 	// debug printing
 	if (r->debug) {
-		printf("send %d bytes: ", bytes_out);
 		for (j = 0; j < bytes_out; j++)
 			printf("%x ", r->swap[j]);
 		printf("\n");
@@ -262,11 +287,6 @@ int b3m_com_send(B3MData * r, UINT id, UINT address, UCHAR *data, int byte)
 	}
 	r->swap[n] = sum & 0xff;
 
-    printf("SENT DATA: ");
-	for (i=0; i<n+1; i++) {
-		printf("%x ", r->swap[i]);
-	}
-	printf("\n");
 	// synchronize with servo
 	if ((i = b3m_trx_timeout(r, 7 + byte, 5, B3M_POS_TIMEOUT)) < 0)
 		return i;
