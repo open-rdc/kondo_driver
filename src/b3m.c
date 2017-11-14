@@ -90,20 +90,6 @@ int b3m_init(B3MData * r, const char* serial_port)
 	}
 	for(i = 0; i < 256; i ++) target_deg100[i] = 100000;
 
-//	tcgetattr(r->fd, &tio);
-//	printf("%d, %d\n", tio.c_cc[VTIME], tio.c_cc[VMIN]);	
-
-	//tcflush(r->fd, TCIFLUSH);
-	//usleep(10000);
-	//tcdrain(r->fd);
-	//int flags = fcntl(r->fd, F_GETFL, 0);
-	//fcntl(r->fd, F_SETFL, flags | O_NONBLOCK);
-	//int opt = 1;
-	//ioctl(r->fd, FIONBIO, &opt);
-	//ioctl(r->fd, TIOCMBIC, TIOCM_RTS);
-	//ioctl(r->fd, TIOCMBIC, TIOCM_DTR);
-	//fcntl(r->fd, F_SETFL, flags | O_NONBLOCK);
-//	usleep(10000);
 	return 0;
 }
 
