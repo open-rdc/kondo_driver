@@ -248,7 +248,7 @@ class KondoDriver : public hardware_interface::RobotHW
 		}
 	}
 	ros::Time getTime() const {return ros::Time::now();}
-	ros::Duration getPeriod() const {return ros::Duration(0.01);}
+	ros::Duration getPeriod() const {return ros::Duration(0.02);}
 };
 
 int main(int argc, char **argv)
