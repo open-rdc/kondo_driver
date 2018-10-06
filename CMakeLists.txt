@@ -108,7 +108,7 @@ add_executable(kondo_driver src/kondo_driver.cpp src/b3m.c)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(kondo_driver_node kondo_driver_generate_messages_cpp)
+add_dependencies(kondo_driver ${PROJECT_NAME}_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(kondo_driver
